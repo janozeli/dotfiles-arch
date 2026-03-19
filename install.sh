@@ -35,6 +35,11 @@ else
     print_info "yay já instalado, pulando..."
 fi
 
+# ── pacman.conf ──────────────────────────────────────────────────────
+print_info "Configurando pacman.conf..."
+sudo sed -i 's/^#ParallelDownloads.*/ParallelDownloads = 15\nILoveCandy/' /etc/pacman.conf
+print_success "pacman.conf configurado!"
+
 # ── Pacotes via yay/pacman ───────────────────────────────────────────
 print_info "Instalando pacotes via yay..."
 yay -S --noconfirm --needed \
