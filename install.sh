@@ -20,10 +20,14 @@ print_error() {
 
 # ── sudoers NOPASSWD ─────────────────────────────────────────────────
 CURRENT_USER="$(whoami)"
-print_info "Configurando NOPASSWD para $CURRENT_USER..."
-echo "$CURRENT_USER ALL=(ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$CURRENT_USER" >/dev/null
-sudo chmod 440 "/etc/sudoers.d/$CURRENT_USER"
-print_success "NOPASSWD configurado!"
+if ! sudo -n true 2>/dev/null; then
+    print_info "Configurando NOPASSWD para $CURRENT_USER..."
+    echo "$CURRENT_USER ALL=(ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$CURRENT_USER" >/dev/null
+    sudo chmod 440 "/etc/sudoers.d/$CURRENT_USER"
+    print_success "NOPASSWD configurado!"
+    print_info "Execute o script novamente: bash install.sh"
+    exit 0
+fi
 
 # ── yay ──────────────────────────────────────────────────────────────
 if ! command -v yay &>/dev/null; then
