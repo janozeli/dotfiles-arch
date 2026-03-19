@@ -29,8 +29,7 @@ print_success "NOPASSWD configurado!"
 if ! command -v yay &>/dev/null; then
     print_info "Instalando yay..."
     sudo pacman -S --noconfirm --needed git base-devel
-    YAY_PKG="${YAY_PKG:-yay}"
-    git clone "https://aur.archlinux.org/${YAY_PKG}.git" /tmp/yay
+    git clone https://aur.archlinux.org/yay.git /tmp/yay
     cd /tmp/yay
     makepkg -si --noconfirm
     cd -
@@ -59,7 +58,7 @@ yay -S --noconfirm --needed \
     ttf-firacode-nerd ttf-jetbrains-mono-nerd \
     docker-desktop teams-for-linux-bin \
     spotify spotifyd \
-    code pamac-all obsidian-bin
+    code obsidian-bin
 print_success "Pacotes instalados!"
 
 # ── Ferramentas standalone ───────────────────────────────────────────
@@ -94,15 +93,6 @@ if ! command -v claude &>/dev/null; then
     print_success "Claude Code instalado!"
 else
     print_info "Claude Code já instalado, pulando..."
-fi
-
-# opencode
-if ! command -v open-code &>/dev/null; then
-    print_info "Instalando OpenCode..."
-    curl -fsSL https://opencode.ai/install | bash
-    print_success "OpenCode instalado!"
-else
-    print_info "OpenCode já instalado, pulando..."
 fi
 
 # ── Criar diretórios ─────────────────────────────────────────────────
@@ -153,10 +143,14 @@ if command -v claude &>/dev/null; then
 fi
 
 # ── Locale e teclado ─────────────────────────────────────────────────
-print_info "Configurando locale e teclado..."
-sudo localectl set-locale LANG=pt_BR.UTF-8
-sudo localectl set-x11-keymap us,br pc105 altgr-intl,
-print_success "Locale e teclado configurados!"
+if command -v localectl &>/dev/null && pidof systemd &>/dev/null; then
+    print_info "Configurando locale e teclado..."
+    sudo localectl set-locale LANG=pt_BR.UTF-8
+    sudo localectl set-x11-keymap us,br pc105 altgr-intl,
+    print_success "Locale e teclado configurados!"
+else
+    print_info "systemd não detectado, pulando locale/teclado..."
+fi
 
 # ── Aplicar symlinks com GNU Stow ────────────────────────────────────
 print_info "Aplicando symlinks com GNU Stow..."

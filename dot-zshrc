@@ -7,6 +7,3 @@ eval "$(mise activate zsh)"
 # claude
 alias cc="claude --continue"
 alias cn="claude"
-
-# opencode
-export PATH="$HOME/.opencode/bin:$PATH"
