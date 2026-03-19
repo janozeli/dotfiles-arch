@@ -44,6 +44,7 @@ fi
 
 # ── pacman.conf ──────────────────────────────────────────────────────
 print_info "Configurando pacman.conf..."
+sudo sed -i 's/^#Color.*/Color/' /etc/pacman.conf
 sudo sed -i 's/^#ParallelDownloads.*/ParallelDownloads = 15\nILoveCandy/' /etc/pacman.conf
 print_success "pacman.conf configurado!"
 
@@ -52,13 +53,13 @@ print_info "Instalando pacotes via yay..."
 yay -S --noconfirm --needed \
     stow zsh git less wget curl unzip \
     fzf zoxide eza bat tldr \
-    ghostty gh wl-clipboard xclip xsel \
+    ghostty gh wl-clipboard xclip \
     mpv yt-dlp \
     zed firefox zen-browser-bin \
     ttf-firacode-nerd ttf-jetbrains-mono-nerd \
     docker-desktop teams-for-linux-bin \
     spotify spotifyd \
-    code obsidian-bin
+    visual-studio-code-bin obsidian-bin ufw
 print_success "Pacotes instalados!"
 
 # ── Ferramentas standalone ───────────────────────────────────────────
@@ -143,8 +144,10 @@ if command -v claude &>/dev/null; then
 fi
 
 # ── Locale e teclado ─────────────────────────────────────────────────
-if command -v localectl &>/dev/null && pidof systemd &>/dev/null; then
+if pidof systemd &>/dev/null; then
     print_info "Configurando locale e teclado..."
+    sudo sed -i 's/^#pt_BR.UTF-8/pt_BR.UTF-8/' /etc/locale.gen
+    sudo locale-gen
     sudo localectl set-locale LANG=pt_BR.UTF-8
     sudo localectl set-x11-keymap us,br pc105 altgr-intl,
     print_success "Locale e teclado configurados!"
@@ -157,4 +160,24 @@ print_info "Aplicando symlinks com GNU Stow..."
 stow --dotfiles -t "$HOME" .
 print_success "Symlinks criados com sucesso!"
 
-print_success "Instalação concluída! Reinicie o terminal ou execute: chsh -s \$(which zsh)"
+# ── Serviços ─────────────────────────────────────────────────────────
+if pidof systemd &>/dev/null; then
+    print_info "Habilitando serviços..."
+    sudo systemctl enable --now fstrim.timer
+    sudo systemctl enable --now docker.service
+    sudo systemctl enable --now ufw.service
+    sudo ufw default deny incoming
+    sudo ufw default allow outgoing
+    sudo ufw enable
+    systemctl --user enable --now spotifyd.service
+    print_success "Serviços habilitados!"
+fi
+
+# ── Shell padrão ─────────────────────────────────────────────────────
+if [ "$SHELL" != "$(which zsh)" ]; then
+    print_info "Mudando shell padrão para zsh..."
+    sudo chsh -s "$(which zsh)" "$CURRENT_USER"
+    print_success "Shell alterado para zsh!"
+fi
+
+print_success "Instalação concluída! Reinicie o terminal."

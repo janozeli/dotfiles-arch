@@ -1,0 +1,103 @@
+{
+  "archinstall-language": "English",
+  "audio_config": {
+    "audio": "pipewire"
+  },
+  "bootloader_config": {
+    "bootloader": "Systemd-boot",
+    "uki": false,
+    "removable": false
+  },
+  "debug": false,
+  "hostname": "arch",
+  "kernels": [
+    "linux",
+    "linux-lts"
+  ],
+  "locale_config": {
+    "kb_layout": "us,br",
+    "sys_lang": "pt_BR.UTF-8",
+    "sys_enc": "UTF-8"
+  },
+  "network_config": {
+    "type": "nm"
+  },
+  "ntp": true,
+  "timezone": "America/Sao_Paulo",
+  "disk_config": {
+    "config_type": "manual_partitioning",
+    "device_modifications": [
+      {
+        "device": "/dev/nvme0n1",
+        "partitions": [
+          {
+            "btrfs": [],
+            "flags": [
+              "boot"
+            ],
+            "fs_type": "fat32",
+            "mount_options": [],
+            "mountpoint": "/efi",
+            "status": "existing",
+            "type": "primary",
+            "dev_path": "/dev/nvme0n1p1",
+            "obj_id": "efi-part"
+          },
+          {
+            "btrfs": [
+              {
+                "name": "@",
+                "mountpoint": "/"
+              },
+              {
+                "name": "@home",
+                "mountpoint": "/home"
+              },
+              {
+                "name": "@log",
+                "mountpoint": "/var/log"
+              },
+              {
+                "name": "@pkg",
+                "mountpoint": "/var/cache/pacman/pkg"
+              }
+            ],
+            "flags": [],
+            "fs_type": "btrfs",
+            "mount_options": [
+              "compress=zstd",
+              "noatime"
+            ],
+            "mountpoint": null,
+            "status": "create",
+            "type": "primary",
+            "dev_path": "/dev/nvme0n1p3",
+            "obj_id": "root-part"
+          },
+          {
+            "btrfs": [],
+            "flags": [],
+            "fs_type": "swap",
+            "mount_options": [],
+            "mountpoint": null,
+            "status": "existing",
+            "type": "primary",
+            "dev_path": "/dev/nvme0n1p4",
+            "obj_id": "swap-part"
+          }
+        ]
+      }
+    ]
+  },
+  "profile_config": {
+    "profile": {
+      "name": "cosmic",
+      "type": "desktop"
+    }
+  },
+  "swap": true,
+  "custom_commands": [
+    "echo 'lucas-janozeli ALL=(ALL) NOPASSWD: ALL' > /mnt/archinstall/etc/sudoers.d/lucas-janozeli",
+    "chmod 440 /mnt/archinstall/etc/sudoers.d/lucas-janozeli"
+  ]
+}
