@@ -1,5 +1,5 @@
 # Default editor
-export EDITOR='zeditor'
+export EDITOR='zed'
 
 # Install zinit if it's not installed
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -23,10 +23,7 @@ zinit snippet OMZP::git
 zinit snippet OMZP::sudo
 zinit snippet OMZP::archlinux
 zinit snippet OMZP::command-not-found
-
-#asdf
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
+zinit snippet OMZP::extract
 
 # Load completions
 autoload -Uz compinit && compinit
@@ -62,10 +59,13 @@ eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDob
 
 # alias
 alias szsh="source ~/.zshrc"
-alias cc="clear"
 alias ".."="cd .."
 alias ls="eza --header --long --icons --git"
-alias cat="bat"
+if command -v bat &>/dev/null; then
+  alias cat='bat'
+elif command -v batcat &>/dev/null; then
+  alias cat='batcat'
+fi
 alias zshrc='${EDITOR:-nano} $HOME/.zshrc'
 alias zshrce='${EDITOR:-nano} $HOME/.zshrc_extend'
 alias ghosttyrc='${EDITOR:-nano} $HOME/.config/ghostty/config'
