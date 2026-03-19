@@ -60,23 +60,10 @@ else
     print_info "mise já instalado, pulando..."
 fi
 
-# uv
-if ! command -v uv &>/dev/null; then
-    print_info "Instalando uv..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    print_success "uv instalado!"
-else
-    print_info "uv já instalado, pulando..."
-fi
-
-# pnpm
-if ! command -v pnpm &>/dev/null; then
-    print_info "Instalando pnpm..."
-    curl -fsSL https://get.pnpm.io/install.sh | sh -
-    print_success "pnpm instalado!"
-else
-    print_info "pnpm já instalado, pulando..."
-fi
+eval "$("$HOME/.local/bin/mise" activate bash)"
+mise install node@lts uv@latest pnpm@latest
+mise use --global node@lts uv@latest pnpm@latest
+print_success "Node (LTS), uv e pnpm instalados via mise!"
 
 # oh-my-posh
 if ! command -v oh-my-posh &>/dev/null; then
@@ -142,6 +129,14 @@ EOF
     print_info ".env criado em ~/.env — preencha as chaves"
 else
     print_info ".env já existe, pulando..."
+fi
+
+# ── Claude MCP servers ───────────────────────────────────────────────
+if command -v claude &>/dev/null; then
+    print_info "Configurando MCP servers do Claude..."
+    claude mcp add --scope user exa -e EXA_API_KEY="${EXA_API_KEY}" -- npx -y exa-mcp-server --tools=web_search_exa,get_code_context_exa,web_search_advanced_exa,crawling_exa
+    claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp --api-key "${CONTEXT7_API_KEY}"
+    print_success "MCP servers configurados!"
 fi
 
 # ── Locale e teclado ─────────────────────────────────────────────────
