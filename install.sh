@@ -62,6 +62,14 @@ yay -S --noconfirm --needed \
     visual-studio-code-bin obsidian-bin ufw
 print_success "Pacotes instalados!"
 
+# ── Criar diretórios ─────────────────────────────────────────────────
+print_info "Criando diretórios..."
+mkdir -p "$HOME/.local/bin"
+mkdir -p "$HOME/.config"
+mkdir -p "$HOME/workspace/github.com/janozeli"
+mkdir -p "$HOME/workspace/github.com/hetosoft"
+print_success "Diretórios criados!"
+
 # ── Ferramentas standalone ───────────────────────────────────────────
 
 # mise
@@ -95,13 +103,6 @@ if ! command -v claude &>/dev/null; then
 else
     print_info "Claude Code já instalado, pulando..."
 fi
-
-# ── Criar diretórios ─────────────────────────────────────────────────
-print_info "Criando diretórios..."
-mkdir -p "$HOME/.local/bin"
-mkdir -p "$HOME/.config"
-mkdir -p "$HOME/workspace/github.com/janozeli"
-mkdir -p "$HOME/workspace/github.com/hetosoft"
 
 # ── Git configs por workspace ────────────────────────────────────────
 print_info "Configurando identidades git por workspace..."
