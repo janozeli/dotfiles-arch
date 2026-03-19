@@ -25,7 +25,7 @@ if ! sudo -n true 2>/dev/null; then
     echo "$CURRENT_USER ALL=(ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$CURRENT_USER" >/dev/null
     sudo chmod 440 "/etc/sudoers.d/$CURRENT_USER"
     print_success "NOPASSWD configurado!"
-    print_info "Execute o script novamente: bash install.sh"
+    print_info "Execute o script novamente: ~/dotfiles-arch/install.sh"
     exit 0
 fi
 
