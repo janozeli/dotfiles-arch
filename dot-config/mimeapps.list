@@ -1,0 +1,15 @@
+[Default Applications]
+x-scheme-handler/http=app.zen_browser.zen.desktop
+text/html=app.zen_browser.zen.desktop
+application/xhtml+xml=app.zen_browser.zen.desktop
+x-scheme-handler/https=app.zen_browser.zen.desktop
+text/plain=dev.zed.Zed.desktop
+text/x-python=dev.zed.Zed.desktop
+text/x-csrc=dev.zed.Zed.desktop
+text/x-script=dev.zed.Zed.desktop
+
+[Added Associations]
+x-scheme-handler/http=app.zen_browser.zen.desktop;
+text/html=app.zen_browser.zen.desktop;
+application/xhtml+xml=app.zen_browser.zen.desktop;
+x-scheme-handler/https=app.zen_browser.zen.desktop;
