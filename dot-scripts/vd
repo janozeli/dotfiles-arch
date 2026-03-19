@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if ! video=$(wl-paste); then
-	echo "vd: wl-paste failed" >&2
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+	video=$(wl-paste)
+elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
+	video=$(xclip -selection clipboard -o)
+else
+	echo "vd: unsupported session type: $XDG_SESSION_TYPE" >&2
 	exit 1
 fi
 
