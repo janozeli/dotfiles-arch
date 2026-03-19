@@ -10,6 +10,6 @@ test-arch:
 
 test-dotfiles:
 	docker build -t dotfiles-test -f Dockerfile.dotfiles ..
-	docker run -it --rm dotfiles-test
+	docker run --rm dotfiles-test bash -c "curl -fsSL janozeli.github.io/install.sh | bash -s dotfiles"
 
 test: test-arch test-dotfiles
