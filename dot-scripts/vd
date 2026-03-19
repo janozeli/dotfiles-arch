@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! video=$(wl-paste); then
+	echo "vd: wl-paste failed" >&2
+	exit 1
+fi
+
+if [ -z "$video" ]; then
+	echo "vd: clipboard is empty" >&2
+	exit 1
+fi
+
+nohup mpv "$video" &
