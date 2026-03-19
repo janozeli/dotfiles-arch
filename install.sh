@@ -19,9 +19,10 @@ print_error() {
 }
 
 # ── sudoers NOPASSWD ─────────────────────────────────────────────────
-print_info "Configurando NOPASSWD para $USER..."
-echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USER" >/dev/null
-sudo chmod 440 "/etc/sudoers.d/$USER"
+CURRENT_USER="$(whoami)"
+print_info "Configurando NOPASSWD para $CURRENT_USER..."
+echo "$CURRENT_USER ALL=(ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$CURRENT_USER" >/dev/null
+sudo chmod 440 "/etc/sudoers.d/$CURRENT_USER"
 print_success "NOPASSWD configurado!"
 
 # ── yay ──────────────────────────────────────────────────────────────
