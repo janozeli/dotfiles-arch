@@ -1,13 +1,19 @@
-[user]
-	email = lucasmjanozeli@gmail.com
-	name = janozeli
+[includeIf "gitdir:~/workspace/github.com/janozeli/"]
+	path = ~/workspace/github.com/janozeli/.gitconfig
+
+[includeIf "gitdir:~/workspace/github.com/hetosoft/"]
+	path = ~/workspace/github.com/hetosoft/.gitconfig
+
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !/usr/bin/gh auth git-credential
+
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !/usr/bin/gh auth git-credential
+
 [init]
 	defaultbranch = main
+
 [pull]
 	rebase = true
