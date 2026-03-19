@@ -57,7 +57,7 @@ yay -S --noconfirm --needed \
     mpv yt-dlp \
     zed firefox zen-browser-bin \
     ttf-firacode-nerd ttf-jetbrains-mono-nerd \
-    docker-desktop teams-for-linux-bin \
+    docker docker-compose teams-for-linux-bin \
     spotify spotifyd \
     visual-studio-code-bin obsidian-bin ufw
 print_success "Pacotes instalados!"
