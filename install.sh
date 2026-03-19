@@ -29,7 +29,8 @@ print_success "NOPASSWD configurado!"
 if ! command -v yay &>/dev/null; then
     print_info "Instalando yay..."
     sudo pacman -S --noconfirm --needed git base-devel
-    git clone https://aur.archlinux.org/yay-bin.git /tmp/yay
+    YAY_PKG="${YAY_PKG:-yay}"
+    git clone "https://aur.archlinux.org/${YAY_PKG}.git" /tmp/yay
     cd /tmp/yay
     makepkg -si --noconfirm
     cd -

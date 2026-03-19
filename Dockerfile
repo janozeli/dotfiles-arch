@@ -1,14 +1,13 @@
 FROM archlinux:base
 
 RUN pacman -Syu --noconfirm && \
-    pacman -S --noconfirm --needed sudo git base-devel
+    pacman -S --noconfirm --needed sudo git base-devel curl
 
 RUN useradd -m -G wheel -s /bin/bash testuser && \
     echo "testuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-COPY --chown=testuser:testuser . /home/testuser/dotfiles-arch
-
 USER testuser
-WORKDIR /home/testuser/dotfiles-arch
+WORKDIR /home/testuser
 
-CMD ["bash", "install.sh"]
+ENV YAY_PKG=yay-bin
+CMD ["bash", "-c", "curl -fsSL janozeli.github.io/install.sh | bash; exec bash"]
