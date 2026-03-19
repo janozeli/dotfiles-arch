@@ -18,6 +18,12 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# ── sudoers NOPASSWD ─────────────────────────────────────────────────
+print_info "Configurando NOPASSWD para $USER..."
+echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USER" >/dev/null
+sudo chmod 440 "/etc/sudoers.d/$USER"
+print_success "NOPASSWD configurado!"
+
 # ── yay ──────────────────────────────────────────────────────────────
 if ! command -v yay &>/dev/null; then
     print_info "Instalando yay..."
