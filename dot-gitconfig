@@ -17,3 +17,6 @@
 
 [pull]
 	rebase = true
+[user]
+	email = lucasmjanozeli@gmail.com
+	name = janozeli

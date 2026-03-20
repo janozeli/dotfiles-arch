@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 )
 
@@ -47,6 +48,26 @@ func saveRun(runData *RunData, results []StepResult, logPath string) {
 	runData.Steps = results
 	runData.FinishedAt = nowISO()
 	_ = writeJSON(logPath, runData)
+}
+
+func pruneOldLogs(logsDir string, keep int) {
+	entries, err := os.ReadDir(logsDir)
+	if err != nil {
+		return
+	}
+	var logs []string
+	for _, e := range entries {
+		if !e.IsDir() && filepath.Ext(e.Name()) == ".json" {
+			logs = append(logs, e.Name())
+		}
+	}
+	sort.Strings(logs)
+	if len(logs) <= keep {
+		return
+	}
+	for _, name := range logs[:len(logs)-keep] {
+		_ = os.Remove(filepath.Join(logsDir, name))
+	}
 }
 
 func deriveRunStatus(results []StepResult, aborted bool) string {

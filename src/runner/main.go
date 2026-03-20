@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -27,12 +28,49 @@ func hasSystemd() bool {
 	return err == nil && info.IsDir()
 }
 
+func listSteps() {
+	fmt.Printf(" %2s  %-16s %s\n", "#", "ID", "Name")
+	fmt.Println("──────────────────────────────────────────")
+	for i, step := range Steps() {
+		fmt.Printf(" %2d  %-16s %s\n", i+1, step.ID(), step.Name())
+	}
+}
+
 func main() {
 	force := flag.Bool("force", false, "skip pre-verify checks")
+	list := flag.Bool("list", false, "list available steps and exit")
+	only := flag.String("step", "", "run only these steps (comma-separated IDs)")
 	flag.Parse()
 
 	dir := resolveStepsDir()
 	initBashSteps(dir)
+
+	if *list {
+		listSteps()
+		return
+	}
+
+	// Build filter set from --only
+	filter := map[string]bool{}
+	if *only != "" {
+		for _, id := range strings.Split(*only, ",") {
+			id = strings.TrimSpace(id)
+			if id != "" {
+				filter[id] = true
+			}
+		}
+		// Validate IDs
+		allIDs := map[string]bool{}
+		for _, s := range Steps() {
+			allIDs[s.ID()] = true
+		}
+		for id := range filter {
+			if !allIDs[id] {
+				fmt.Fprintf(os.Stderr, "error: unknown step '%s'\n", id)
+				os.Exit(1)
+			}
+		}
+	}
 
 	startedAt := nowISO()
 	tsFile := time.Now().Format("2006-01-02T15-04-05")
@@ -58,6 +96,10 @@ func main() {
 	aborted := false
 
 	for _, step := range Steps() {
+		if len(filter) > 0 && !filter[step.ID()] {
+			continue
+		}
+
 		fmt.Printf("\n\033[1;33m>>> [%s] %s\033[0m\n", step.ID(), step.Name())
 
 		result := evaluate(step, *force, systemdOK, completed, env)
@@ -90,6 +132,7 @@ func main() {
 	runData.Status = deriveRunStatus(results, aborted)
 	runData.FinishedAt = nowISO()
 	_ = writeJSON(logPath, runData)
+	pruneOldLogs(filepath.Dir(logPath), 3)
 	printSummary(results, logPath)
 
 	if aborted {

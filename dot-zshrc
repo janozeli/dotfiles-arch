@@ -1,9 +1,1 @@
 source $HOME/.zshrc_extend
-[ -f "$HOME/.env" ] && source "$HOME/.env"
-
-# mise
-eval "$(mise activate zsh)"
-
-# claude
-alias cc="claude --continue"
-alias cn="claude"

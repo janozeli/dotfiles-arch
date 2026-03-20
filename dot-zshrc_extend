@@ -1,5 +1,5 @@
 # Default editor
-export EDITOR='zed'
+export EDITOR="zeditor"
 
 #path
 export PATH="$PATH:$HOME/.local/bin"
@@ -70,6 +70,18 @@ if command -v bat &>/dev/null; then
 elif command -v batcat &>/dev/null; then
   alias cat='batcat'
 fi
+
 alias zshrc='${EDITOR:-nano} $HOME/.zshrc'
 alias zshrce='${EDITOR:-nano} $HOME/.zshrc_extend'
 alias ghosttyrc='${EDITOR:-nano} $HOME/.config/ghostty/config'
+alias clauderc='${EDITOR:-nano} $HOME/.claude/settings.json'
+
+# mise
+eval "$(mise activate zsh)"
+
+# env
+[ -f "$HOME/.env" ] && source "$HOME/.env"
+
+# claude
+alias cn="claude --effort max"
+alias cc="cn --continue"

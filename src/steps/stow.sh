@@ -2,4 +2,4 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
-stow --dotfiles -t "$HOME" .
+stow --dotfiles --no-folding -t "$HOME" .

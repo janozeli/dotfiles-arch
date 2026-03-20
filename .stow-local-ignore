@@ -1,4 +1,6 @@
 .git
+.gitignore
+.claude
 install.sh
 src
 janozeli.github.io
