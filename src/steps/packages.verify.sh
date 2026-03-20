@@ -2,7 +2,7 @@
 packages=(
     stow zsh git less wget curl unzip
     fzf zoxide eza bat tldr
-    ghostty github-cli wl-clipboard xclip
+    kitty github-cli wl-clipboard xclip
     mpv yt-dlp
     zed firefox zen-browser-bin google-chrome
     ttf-firacode-nerd ttf-jetbrains-mono-nerd

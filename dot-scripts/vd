@@ -6,13 +6,13 @@ if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
 elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
 	video=$(xclip -selection clipboard -o)
 else
-	echo "vd: unsupported session type: $XDG_SESSION_TYPE" >&2
+	notify-send "vd" "Unsupported session type: $XDG_SESSION_TYPE"
 	exit 1
 fi
 
 if [ -z "$video" ]; then
-	echo "vd: clipboard is empty" >&2
+	notify-send "vd" "Clipboard is empty"
 	exit 1
 fi
 
-nohup mpv "$video" &
+mpv "$video" || notify-send "vd" "Failed to play: $video"

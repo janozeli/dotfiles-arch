@@ -73,7 +73,7 @@ fi
 
 alias zshrc='${EDITOR:-nano} $HOME/.zshrc'
 alias zshrce='${EDITOR:-nano} $HOME/.zshrc_extend'
-alias ghosttyrc='${EDITOR:-nano} $HOME/.config/ghostty/config'
+alias kittyrc='${EDITOR:-nano} $HOME/.config/kitty/kitty.conf'
 alias clauderc='${EDITOR:-nano} $HOME/.claude/settings.json'
 
 # mise

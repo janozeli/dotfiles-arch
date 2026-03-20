@@ -1,9 +1,10 @@
 // Output assembly — combines GSD line with custom extension lines
 // Renders multi-line tree layout or plain single line.
 
-const { DIM, RST } = require('./shared');
+const { DIM, RST, SEP } = require('./shared');
 const { git, gitSegment } = require('./git');
 const { envSegment } = require('./env');
+const { ghSegment } = require('./gh');
 const { loadUsageCache, usageSegment, saveUsage } = require('./usage');
 
 // Line icons (Nerd Font)
@@ -23,7 +24,11 @@ function render(gsdLine, dir) {
   const root = git(dir, 'rev-parse', '--show-toplevel');
 
   const envSeg = envSegment(dir, root);
-  if (envSeg) lines.push({ icon: ICON_ENV, content: envSeg });
+  const ghSeg = ghSegment();
+  if (envSeg || ghSeg) {
+    const parts = [envSeg, ghSeg].filter(Boolean);
+    lines.push({ icon: ICON_ENV, content: parts.join(SEP) });
+  }
 
   const { cache, needFetch } = loadUsageCache();
   const usageSeg = usageSegment(cache);

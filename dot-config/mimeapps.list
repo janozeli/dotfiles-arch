@@ -2,7 +2,7 @@
 application/ogg=com.system76.CosmicPlayer.desktop
 application/x-cue=com.system76.CosmicPlayer.desktop
 application/x-ogg=com.system76.CosmicPlayer.desktop
-application/x-terminal-emulator=com.mitchellh.ghostty.desktop
+application/x-terminal-emulator=kitty.desktop
 application/xhtml+xml=zen.desktop
 audio/aac=com.system76.CosmicPlayer.desktop
 audio/ac3=com.system76.CosmicPlayer.desktop
@@ -76,7 +76,7 @@ x-content/audio-cdda=com.system76.CosmicPlayer.desktop
 x-scheme-handler/chrome=zen.desktop
 x-scheme-handler/http=zen.desktop
 x-scheme-handler/https=zen.desktop
-x-scheme-handler/terminal=com.mitchellh.ghostty.desktop
+x-scheme-handler/terminal=kitty.desktop
 
 [Added Associations]
 application/xhtml+xml=app.zen_browser.zen.desktop
