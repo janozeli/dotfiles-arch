@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/pterm/pterm"
 )
 
 func resolveStepsDir() string {
@@ -23,17 +25,12 @@ func resolveStepsDir() string {
 	return dir
 }
 
-func hasSystemd() bool {
-	info, err := os.Stat("/run/systemd/system")
-	return err == nil && info.IsDir()
-}
-
 func listSteps() {
-	fmt.Printf(" %2s  %-16s %s\n", "#", "ID", "Name")
-	fmt.Println("──────────────────────────────────────────")
+	data := pterm.TableData{{"#", "ID", "Name"}}
 	for i, step := range Steps() {
-		fmt.Printf(" %2d  %-16s %s\n", i+1, step.ID(), step.Name())
+		data = append(data, []string{fmt.Sprintf("%d", i+1), step.ID(), step.Name()})
 	}
+	pterm.DefaultTable.WithHasHeader().WithData(data).Render()
 }
 
 func main() {
@@ -50,7 +47,7 @@ func main() {
 		return
 	}
 
-	// Build filter set from --only
+	// Build filter set from --step
 	filter := map[string]bool{}
 	if *only != "" {
 		for _, id := range strings.Split(*only, ",") {
@@ -90,7 +87,6 @@ func main() {
 	}
 
 	env := os.Environ()
-	systemdOK := hasSystemd()
 	completed := map[string]bool{}
 	var results []StepResult
 	aborted := false
@@ -100,20 +96,23 @@ func main() {
 			continue
 		}
 
-		fmt.Printf("\n\033[1;33m>>> [%s] %s\033[0m\n", step.ID(), step.Name())
+		printStepHeader(step.ID(), step.Name())
 
-		result := evaluate(step, *force, systemdOK, completed, env)
+		sp, _ := pterm.DefaultSpinner.Start(step.Name())
+		result := evaluate(step, *force, completed, env)
+		if result.Status == StatusSuccess || result.Status == StatusWarning {
+			sp.Success(result.Message)
+		} else if result.Status == StatusError {
+			sp.Fail(result.Message)
+		} else {
+			sp.Info(result.Message)
+		}
 
 		if result.Status.Completed() {
 			completed[step.ID()] = true
 		}
 
-		// Print inline status for non-executed steps
-		if result.ExitCode == nil && result.Status != StatusError {
-			fmt.Printf("  (%s: %s)\n", result.Status, result.Message)
-		} else if result.Status == StatusError && result.ExitCode == nil {
-			fmt.Printf("  \033[1;31m(error: %s)\033[0m\n", result.Message)
-		}
+		printStepResult(result)
 
 		results = append(results, result)
 		saveRun(runData, results, logPath)
@@ -123,7 +122,7 @@ func main() {
 			if result.ExitCode != nil {
 				detail = fmt.Sprintf("exit %d", *result.ExitCode)
 			}
-			fmt.Printf("\n\033[1;31m[ABORT] Critical step '%s' failed (%s)\033[0m\n", step.Name(), detail)
+			printAbort(step.Name(), detail)
 			aborted = true
 			break
 		}
@@ -131,7 +130,9 @@ func main() {
 
 	runData.Status = deriveRunStatus(results, aborted)
 	runData.FinishedAt = nowISO()
-	_ = writeJSON(logPath, runData)
+	if err := writeJSON(logPath, runData); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: failed to write log: %v\n", err)
+	}
 	pruneOldLogs(filepath.Dir(logPath), 3)
 	printSummary(results, logPath)
 

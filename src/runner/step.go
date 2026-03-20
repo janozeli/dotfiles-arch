@@ -31,7 +31,6 @@ type Step interface {
 	ID() string
 	Name() string
 	Critical() bool
-	RequiresSystemd() bool
 	DependsOn() []string
 	Verify(env []string) bool
 	Execute(env []string) StepResult

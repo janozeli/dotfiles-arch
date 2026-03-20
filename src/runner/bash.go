@@ -13,19 +13,17 @@ var stepsDir string
 
 // BashStep implements Step by running bash scripts.
 type BashStep struct {
-	id              string
-	name            string
-	script          string // e.g. "yay.sh"
-	critical        bool
-	requiresSystemd bool
-	dependsOn       []string
+	id        string
+	name      string
+	script    string // e.g. "yay.sh"
+	critical  bool
+	dependsOn []string
 }
 
-func (b *BashStep) ID() string            { return b.id }
-func (b *BashStep) Name() string           { return b.name }
-func (b *BashStep) Critical() bool         { return b.critical }
-func (b *BashStep) RequiresSystemd() bool  { return b.requiresSystemd }
-func (b *BashStep) DependsOn() []string    { return b.dependsOn }
+func (b *BashStep) ID() string         { return b.id }
+func (b *BashStep) Name() string        { return b.name }
+func (b *BashStep) Critical() bool      { return b.critical }
+func (b *BashStep) DependsOn() []string { return b.dependsOn }
 
 func (b *BashStep) verifyPath() string {
 	base := b.script[:len(b.script)-len(".sh")]

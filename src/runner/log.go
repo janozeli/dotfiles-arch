@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"sort"
 	"time"
+
+	"github.com/pterm/pterm"
 )
 
 // RunData is the top-level JSON log structure.
@@ -110,21 +112,21 @@ func printSummary(results []StepResult, logPath string) {
 		StatusSkipped: "○ skipped",
 	}
 
-	fmt.Println()
-	fmt.Printf(" %2s  %-28s %-14s %8s\n", "#", "Step", "Status", "Duration")
-	fmt.Println("─────────────────────────────────────────────────────────")
+	data := pterm.TableData{{"#", "Step", "Status", "Duration"}}
 	for i, r := range results {
-		icon := statusIcons[r.Status]
-		dur := formatDuration(r.DurationS)
-		msg := ""
-		if r.Status != StatusError && r.ExitCode == nil {
-			msg = fmt.Sprintf("  (%s)", r.Message)
-		}
-		fmt.Printf(" %2d  %-28s %-14s %8s%s\n", i+1, r.Name, icon, dur, msg)
+		data = append(data, []string{
+			fmt.Sprintf("%d", i+1),
+			r.Name,
+			statusIcons[r.Status],
+			formatDuration(r.DurationS),
+		})
 	}
-	fmt.Println("─────────────────────────────────────────────────────────")
-	fmt.Printf(" Result: %d success, %d warning, %d error, %d skipped   Total: %s\n", success, warnings, errors, skipped, formatDuration(totalS))
+
 	fmt.Println()
-	fmt.Printf(" Log: %s\n", logPath)
+	pterm.DefaultTable.WithHasHeader().WithData(data).Render()
+
+	pterm.Printfln("Result: %d success, %d warning, %d error, %d skipped   Total: %s",
+		success, warnings, errors, skipped, formatDuration(totalS))
+	pterm.FgGray.Printfln("Log: %s", logPath)
 	fmt.Println()
 }

@@ -47,14 +47,12 @@ var (
 	})
 	_ = register(&BashStep{
 		id: "locale", name: "Locale/teclado", script: "locale.sh",
-		requiresSystemd: true,
 	})
 	_ = register(&BashStep{
 		id: "stow", name: "GNU Stow symlinks", script: "stow.sh",
 	})
 	_ = register(&BashStep{
 		id: "services", name: "Serviços", script: "services.sh",
-		requiresSystemd: true,
 	})
 	_ = register(&BashStep{
 		id: "shell", name: "Shell (zsh)", script: "shell.sh",

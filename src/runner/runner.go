@@ -5,18 +5,13 @@ import (
 	"strings"
 )
 
-func evaluate(step Step, force, systemdOK bool, completed map[string]bool, env []string) StepResult {
+func evaluate(step Step, force bool, completed map[string]bool, env []string) StepResult {
 	// 1. Missing verify script
 	if c, ok := step.(Checkable); ok && !c.HasVerify() {
 		return makeResult(step, StatusError, "missing verify script")
 	}
 
-	// 2. Requires systemd
-	if step.RequiresSystemd() && !systemdOK {
-		return makeResult(step, StatusSkipped, "requires systemd")
-	}
-
-	// 3. Dependencies not met
+	// 2. Dependencies not met
 	if deps := step.DependsOn(); len(deps) > 0 {
 		var missing []string
 		for _, d := range deps {
