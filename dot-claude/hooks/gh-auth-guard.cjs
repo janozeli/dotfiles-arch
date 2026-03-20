@@ -55,8 +55,11 @@ process.stdin.on("end", () => {
 
   const command = data.tool_input?.command || "";
 
-  // Only check gh commands, skip auth management commands
-  if (/\bgh\s/.test(command) && !/\bgh\s+auth\s/.test(command)) {
+  const needsAuth =
+    (/\bgh\s/.test(command) && !/\bgh\s+auth\s/.test(command)) ||
+    /\bgit\s+(push|pull|fetch|clone)\b/.test(command);
+
+  if (needsAuth) {
     checkGhAuth();
   }
 
