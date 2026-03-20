@@ -12,7 +12,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ~/.claude/hooks/gh-auth-guard.cjs"
+            "command": "~/.claude/hooks/gh-auth-guard"
           }
         ]
       }
