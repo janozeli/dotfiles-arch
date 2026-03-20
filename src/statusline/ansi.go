@@ -85,7 +85,7 @@ func formatResetCompact(resetsAt string) string {
 	days := totalHours / 24
 	hours := totalHours % 24
 	if days > 0 {
-		return fmt.Sprintf(" \uf1da %dd%02dh", days, hours)
+		return fmt.Sprintf(" \uf252 %dd%02dh", days, hours)
 	}
-	return fmt.Sprintf(" \uf1da %dh%02d", totalHours, minutes)
+	return fmt.Sprintf(" \uf252 %dh%02d", totalHours, minutes)
 }

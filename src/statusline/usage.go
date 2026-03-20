@@ -168,7 +168,7 @@ func usageSegment(cache UsageCache) string {
 		util := math.Round(cache.FiveHour.Utilization)
 		color := thresholdColor(util)
 		reset := formatResetCompact(cache.FiveHour.ResetsAt)
-		parts = append(parts, color+osc8Link(usageURL, fmt.Sprintf("\uf1da Session: %.0f%%%s", util, reset))+Rst)
+		parts = append(parts, color+osc8Link(usageURL, fmt.Sprintf("Session: %.0f%%%s", util, reset))+Rst)
 	}
 
 	if cache.SevenDay.Utilization > 0 {
