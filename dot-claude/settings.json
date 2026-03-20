@@ -1,11 +1,21 @@
 {
-  "model": "default",
-  "effortLevel": "max",
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
     "defaultMode": "bypassPermissions"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/gh-auth-guard.cjs"
+          }
+        ]
+      }
+    ]
   },
   "statusLine": {
     "type": "command",
@@ -21,16 +31,5 @@
     "github@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true
   },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ~/.claude/hooks/gh-auth-guard.cjs"
-          }
-        ]
-      }
-    ]
-  }
+  "skipDangerousModePermissionPrompt": true
 }

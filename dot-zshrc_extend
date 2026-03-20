@@ -1,6 +1,10 @@
 # Default editor
 export EDITOR='zed'
 
+#path
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.scripts"
+
 # Install zinit if it's not installed
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 if [ ! -d "$ZINIT_HOME" ]; then
@@ -69,7 +73,3 @@ fi
 alias zshrc='${EDITOR:-nano} $HOME/.zshrc'
 alias zshrce='${EDITOR:-nano} $HOME/.zshrc_extend'
 alias ghosttyrc='${EDITOR:-nano} $HOME/.config/ghostty/config'
-
-#path
-export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:$HOME/.scripts"

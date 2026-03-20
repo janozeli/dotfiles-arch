@@ -1,8 +1,0 @@
-FROM archlinux:base-devel
-
-RUN pacman -Syu --noconfirm && \
-    pacman -S --noconfirm --needed archinstall
-
-WORKDIR /data
-
-ENTRYPOINT ["archinstall", "--dry-run", "--silent", "--skip-version-check", "--config"]

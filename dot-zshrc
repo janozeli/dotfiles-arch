@@ -1,5 +1,5 @@
 source $HOME/.zshrc_extend
-source $HOME/.env
+[ -f "$HOME/.env" ] && source "$HOME/.env"
 
 # mise
 eval "$(mise activate zsh)"

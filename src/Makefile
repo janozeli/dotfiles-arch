@@ -1,15 +1,4 @@
-.PHONY: test test-arch test-dotfiles
+.PHONY: build
 
-ARCHINSTALL_IMAGE = archinstall-validate
-
-test-arch:
-	@docker build -q -t $(ARCHINSTALL_IMAGE) -f Dockerfile.archinstall . > /dev/null
-	@echo "Validando archinstall JSONs..."
-	@docker run --rm -v $(PWD):/data $(ARCHINSTALL_IMAGE) /data/archinstall-manual.json && echo "OK archinstall-manual.json"
-	@docker run --rm -v $(PWD):/data $(ARCHINSTALL_IMAGE) /data/archinstall-auto.json && echo "OK archinstall-auto.json"
-
-test-dotfiles:
-	docker build -t dotfiles-test -f Dockerfile.dotfiles ..
-	docker run --rm dotfiles-test bash -c "curl -fsSL janozeli.github.io/install.sh | bash -s dotfiles"
-
-test: test-arch test-dotfiles
+build:
+	cd runner && go build -o runner .
