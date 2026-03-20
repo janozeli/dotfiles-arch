@@ -19,6 +19,10 @@ var (
 		critical: true,
 	})
 	_ = register(&BashStep{
+		id: "gpu_drivers", name: "GPU drivers", script: "gpu_drivers.sh",
+		dependsOn: []string{"packages"},
+	})
+	_ = register(&BashStep{
 		id: "directories", name: "Diretórios", script: "directories.sh",
 		critical: true,
 	})
