@@ -68,15 +68,11 @@ func thresholdColor(pct float64) string {
 	return CGreen
 }
 
-func formatResetCompact(resetsAt string) string {
-	if resetsAt == "" {
+func formatResetCompact(resetsAt int64) string {
+	if resetsAt == 0 {
 		return ""
 	}
-	t, err := time.Parse(time.RFC3339, resetsAt)
-	if err != nil {
-		return ""
-	}
-	diff := time.Until(t)
+	diff := time.Until(time.Unix(resetsAt, 0))
 	if diff <= 0 {
 		return ""
 	}

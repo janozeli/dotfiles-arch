@@ -12,6 +12,17 @@ import (
 	"time"
 )
 
+type RateLimits struct {
+	FiveHour struct {
+		UsedPercentage float64 `json:"used_percentage"`
+		ResetsAt       int64   `json:"resets_at"`
+	} `json:"five_hour"`
+	SevenDay struct {
+		UsedPercentage float64 `json:"used_percentage"`
+		ResetsAt       int64   `json:"resets_at"`
+	} `json:"seven_day"`
+}
+
 type Input struct {
 	Model struct {
 		DisplayName string `json:"display_name"`
@@ -24,6 +35,7 @@ type Input struct {
 		RemainingPercentage *float64 `json:"remaining_percentage"`
 		TotalTokens         int      `json:"total_tokens"`
 	} `json:"context_window"`
+	RateLimits RateLimits `json:"rate_limits"`
 }
 
 func main() {
@@ -37,6 +49,8 @@ func main() {
 		return
 	}
 	timer.Stop()
+
+	debugDump("statusline-raw-input.json", raw)
 
 	var data Input
 	if err := json.Unmarshal(raw, &data); err != nil {
@@ -131,7 +145,7 @@ func main() {
 		}
 	}
 
-	render(gsdLine, dir)
+	render(gsdLine, dir, data.RateLimits)
 }
 
 func findCurrentTask(todosDir, session string) string {

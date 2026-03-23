@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func render(gsdLine, dir string) {
+func render(gsdLine, dir string, rateLimits RateLimits) {
 	lines := []string{gsdLine}
 
 	root := gitCmd(dir, "rev-parse", "--show-toplevel")
@@ -17,8 +17,7 @@ func render(gsdLine, dir string) {
 		lines = append(lines, strings.Join(parts, Sep))
 	}
 
-	cache, needFetch := loadUsageCache()
-	usageSeg := usageSegment(cache)
+	usageSeg := usageSegment(rateLimits)
 	if usageSeg != "" {
 		lines = append(lines, usageSeg)
 	}
@@ -50,11 +49,6 @@ func render(gsdLine, dir string) {
 	}
 	out = append(out, bot)
 	fmt.Print(strings.Join(out, "\n"))
-
-	// Deferred: refresh usage cache if stale (runs after output)
-	if needFetch {
-		saveUsage()
-	}
 }
 
 func filterEmpty(ss ...string) []string {

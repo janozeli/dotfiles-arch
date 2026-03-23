@@ -20,7 +20,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/hooks/gsd-statusline"
+    "command": "~/.claude/hooks/gsd-statusline --debug"
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
