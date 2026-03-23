@@ -15,6 +15,36 @@
             "command": "~/.claude/hooks/gh-auth-guard"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/gsd-statusline gsd-prompt-guard"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/gsd-statusline gsd-check-update"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/gsd-statusline gsd-context-monitor"
+          }
+        ]
       }
     ]
   },

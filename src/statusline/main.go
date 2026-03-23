@@ -7,7 +7,6 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 )
@@ -38,7 +37,22 @@ type Input struct {
 	RateLimits RateLimits `json:"rate_limits"`
 }
 
+func subcommand() string {
+	for _, arg := range os.Args[1:] {
+		if arg == "--debug" {
+			continue
+		}
+		return arg
+	}
+	return ""
+}
+
 func main() {
+	if sub := subcommand(); sub != "" {
+		gsdDispatch(sub)
+		return
+	}
+
 	// Timeout guard: if stdin doesn't close within 3s, exit silently
 	timer := time.AfterFunc(3*time.Second, func() {
 		os.Exit(0)
@@ -125,10 +139,12 @@ func main() {
 		task = findCurrentTask(todosDir, session)
 	}
 
-	// GSD update available?
+	// GSD update available? (only if current project uses GSD)
 	gsdUpdate := ""
-	gsdCacheFile := filepath.Join(claudeDir, "cache", "gsd-update-check.json")
-	gsdUpdate = checkGsdUpdate(gsdCacheFile)
+	if _, err := os.Stat(filepath.Join(dir, ".planning")); err == nil {
+		gsdCacheFile := filepath.Join(claudeDir, "cache", "gsd-update-check.json")
+		gsdUpdate = checkGsdUpdate(gsdCacheFile)
+	}
 
 	// Build GSD line
 	ctxSep := " " + CComment + "\u2502" + Rst
@@ -148,77 +164,3 @@ func main() {
 	render(gsdLine, dir, data.RateLimits)
 }
 
-func findCurrentTask(todosDir, session string) string {
-	entries, err := os.ReadDir(todosDir)
-	if err != nil {
-		return ""
-	}
-
-	type fileEntry struct {
-		name  string
-		mtime time.Time
-	}
-	var matches []fileEntry
-	for _, e := range entries {
-		name := e.Name()
-		if strings.HasPrefix(name, session) && strings.Contains(name, "-agent-") && strings.HasSuffix(name, ".json") {
-			info, err := e.Info()
-			if err != nil {
-				continue
-			}
-			matches = append(matches, fileEntry{name: name, mtime: info.ModTime()})
-		}
-	}
-
-	sort.Slice(matches, func(i, j int) bool {
-		return matches[i].mtime.After(matches[j].mtime)
-	})
-
-	if len(matches) == 0 {
-		return ""
-	}
-
-	data, err := os.ReadFile(filepath.Join(todosDir, matches[0].name))
-	if err != nil {
-		return ""
-	}
-
-	var todos []struct {
-		Status     string `json:"status"`
-		ActiveForm string `json:"activeForm"`
-	}
-	if err := json.Unmarshal(data, &todos); err != nil {
-		return ""
-	}
-
-	for _, t := range todos {
-		if t.Status == "in_progress" {
-			return t.ActiveForm
-		}
-	}
-	return ""
-}
-
-func checkGsdUpdate(cacheFile string) string {
-	data, err := os.ReadFile(cacheFile)
-	if err != nil {
-		return ""
-	}
-
-	var cache struct {
-		UpdateAvailable bool     `json:"update_available"`
-		StaleHooks      []string `json:"stale_hooks"`
-	}
-	if err := json.Unmarshal(data, &cache); err != nil {
-		return ""
-	}
-
-	result := ""
-	if cache.UpdateAvailable {
-		result += "\x1b[33m\u2b06 /gsd:update\x1b[0m \u2502 "
-	}
-	if len(cache.StaleHooks) > 0 {
-		result += "\x1b[31m\u26a0 stale hooks \u2014 run /gsd:update\x1b[0m \u2502 "
-	}
-	return result
-}
