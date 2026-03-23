@@ -19,6 +19,14 @@ var (
 		critical: true,
 	})
 	_ = register(&BashStep{
+		id: "flatpak_repos", name: "Flatpak repos (Flathub)", script: "flatpak_repos.sh",
+		dependsOn: []string{"packages"},
+	})
+	_ = register(&BashStep{
+		id: "flatpak_apps", name: "Flatpak apps", script: "flatpak_apps.sh",
+		dependsOn: []string{"flatpak_repos"},
+	})
+	_ = register(&BashStep{
 		id: "gpu_drivers", name: "GPU drivers", script: "gpu_drivers.sh",
 		dependsOn: []string{"packages"},
 	})

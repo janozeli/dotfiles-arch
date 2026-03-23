@@ -9,6 +9,6 @@ yay -S --noconfirm --needed \
     zed firefox zen-browser-bin google-chrome \
     ttf-firacode-nerd ttf-jetbrains-mono-nerd \
     docker docker-compose teams-for-linux-bin \
-    spotify-launcher spotifyd \
+    flatpak \
     visual-studio-code-bin obsidian-bin ufw \
     snap-pac
