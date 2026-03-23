@@ -15,3 +15,8 @@ cat > "$HOME/workspace/github.com/hetosoft/.gitconfig" << 'EOF'
 	email = lucas.janozeli@hetosoft.com.br
 	name = LucasJanozeli-Hetosoft
 EOF
+
+# Set local identity in dotfiles repo (wherever it lives)
+dotfiles_root="$(git rev-parse --show-toplevel)"
+git -C "$dotfiles_root" config user.name "janozeli"
+git -C "$dotfiles_root" config user.email "lucasmjanozeli@gmail.com"

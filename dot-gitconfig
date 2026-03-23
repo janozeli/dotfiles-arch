@@ -1,3 +1,7 @@
+[user]
+	email = lucasmjanozeli@gmail.com
+	name = janozeli
+
 [includeIf "gitdir:~/workspace/github.com/janozeli/"]
 	path = ~/workspace/github.com/janozeli/.gitconfig
 
@@ -17,6 +21,3 @@
 
 [pull]
 	rebase = true
-[user]
-	email = lucasmjanozeli@gmail.com
-	name = janozeli
