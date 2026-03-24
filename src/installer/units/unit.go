@@ -1,6 +1,9 @@
-package main
+package units
 
-import "fmt"
+import (
+	"fmt"
+	"path/filepath"
+)
 
 // Status represents the outcome of a task evaluation.
 type Status string
@@ -16,19 +19,6 @@ func (s Status) Completed() bool {
 	return s == StatusSuccess || s == StatusWarning
 }
 
-// StepResult holds the outcome of evaluating a single step.
-// Kept for backward compatibility with JSON logs.
-type StepResult struct {
-	ID         string `json:"id"`
-	Name       string `json:"name"`
-	Status     Status `json:"status"`
-	Message    string `json:"message"`
-	StartedAt  string `json:"started_at"`
-	FinishedAt string `json:"finished_at"`
-	DurationS  int    `json:"duration_s"`
-	ExitCode   *int   `json:"exit_code"`
-}
-
 // Unit is a pure data struct parsed from a unit.yaml file.
 // It declares what the unit needs; the runner decides how to fulfill it.
 type Unit struct {
@@ -42,7 +32,6 @@ type Unit struct {
 }
 
 // Stage is a named block within a unit's pipeline (e.g., verify, setup).
-// Stages are free-form — the runner iterates them in declared order.
 type Stage struct {
 	Name          string        `yaml:"name"`
 	Tasks         []Task        `yaml:"tasks"`
@@ -57,7 +46,6 @@ type Task struct {
 }
 
 // ExecutionPlan declares how a stage wants to be executed.
-// The runner reads this and decides how to fulfill each requirement.
 type ExecutionPlan struct {
 	Shell   string      `yaml:"shell"`
 	Timeout int         `yaml:"timeout"`
@@ -76,6 +64,18 @@ type RetryPolicy struct {
 type Action struct {
 	Task        string `yaml:"task"`
 	Description string `yaml:"description"`
+}
+
+// TaskResult holds the outcome of executing a single task.
+type TaskResult struct {
+	ID        string `json:"id"`
+	UnitID    string `json:"unit_id"`
+	Status    Status `json:"status"`
+	Message   string `json:"message"`
+	ExitCode  *int   `json:"exit_code"`
+	StartedAt string `json:"started_at"`
+	Duration  int    `json:"duration_s"`
+	LogPath   string `json:"log_path,omitempty"`
 }
 
 var (
@@ -111,14 +111,15 @@ func (u Unit) Validate() error {
 	return nil
 }
 
-// TaskResult holds the outcome of executing a single task.
-type TaskResult struct {
-	ID        string `json:"id"`
-	UnitID    string `json:"unit_id"`
-	Status    Status `json:"status"`
-	Message   string `json:"message"`
-	ExitCode  *int   `json:"exit_code"`
-	StartedAt string `json:"started_at"`
-	Duration  int    `json:"duration_s"`
-	LogPath   string `json:"log_path,omitempty"`
+// ResolveUnitPaths fills Dir and Task.Path for all units based on unitsDir.
+func ResolveUnitPaths(unitsDir string, all []Unit) {
+	for i := range all {
+		all[i].Dir = filepath.Join(unitsDir, all[i].ID)
+		for j := range all[i].Stages {
+			for k := range all[i].Stages[j].Tasks {
+				t := &all[i].Stages[j].Tasks[k]
+				t.Path = filepath.Join(all[i].Dir, "tasks", t.Name)
+			}
+		}
+	}
 }
