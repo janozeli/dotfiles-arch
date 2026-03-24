@@ -1,11 +1,8 @@
 [tools]
 go = "latest"
 
-[tasks.generate]
-run = "go generate -C src/installer ./units"
-
 [tasks.build]
-run = "go generate -C src/installer ./units && go build -C src/installer -o runner ./cmd/runner"
+run = "go build -C src/installer -o runner ./cmd/runner"
 
 [tasks.test]
 run = "go test -C src/installer ./..."

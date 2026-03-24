@@ -1,9 +1,6 @@
 package units
 
-import (
-	"fmt"
-	"path/filepath"
-)
+import "fmt"
 
 // Status represents the outcome of a task evaluation.
 type Status string
@@ -19,51 +16,51 @@ func (s Status) Completed() bool {
 	return s == StatusSuccess || s == StatusWarning
 }
 
-// Unit is a pure data struct parsed from a unit.yaml file.
-// It declares what the unit needs; the runner decides how to fulfill it.
+// Unit declares what a unit needs; the runner decides how to fulfill it.
 type Unit struct {
-	ID       string            `yaml:"id"`
-	Name     string            `yaml:"name"`
-	Critical bool              `yaml:"critical"`
-	Stages   []Stage           `yaml:"stages"`
-	Actions  map[string]Action `yaml:"actions"`
-	Flags    map[string]any    `yaml:"flags"`
-	Dir      string            `yaml:"-"`
+	ID       string
+	Name     string
+	Critical bool
+	Stages   []Stage
+	Actions  map[string]Action
+	Flags    map[string]any
+	Dir      string
 }
 
-// Stage is a named block within a unit's pipeline (e.g., verify, setup).
+// Stage is a named block within a unit's pipeline.
 type Stage struct {
-	Name          string        `yaml:"name"`
-	Tasks         []Task        `yaml:"tasks"`
-	ExecutionPlan ExecutionPlan `yaml:"executor"`
+	Name          string
+	Tasks         []Task
+	ExecutionPlan ExecutionPlan
 }
 
-// Task is the atomic unit of execution — a single executable file.
+// Task is the atomic unit of execution.
 type Task struct {
-	Name      string   `yaml:"task"`
-	DependsOn []string `yaml:"depends_on"`
-	Path      string   `yaml:"-"`
+	Name      string
+	DependsOn []string
+	Path      string
+	UnitID    string
 }
 
 // ExecutionPlan declares how a stage wants to be executed.
 type ExecutionPlan struct {
-	Shell   string      `yaml:"shell"`
-	Timeout int         `yaml:"timeout"`
-	Sudo    bool        `yaml:"sudo"`
-	Env     []string    `yaml:"env"`
-	Retry   RetryPolicy `yaml:"retry"`
+	Shell   string
+	Timeout int
+	Sudo    bool
+	Env     []string
+	Retry   RetryPolicy
 }
 
 // RetryPolicy defines retry behavior for a stage.
 type RetryPolicy struct {
-	MaxAttempts int `yaml:"max_attempts"`
-	Delay       int `yaml:"delay"`
+	MaxAttempts int
+	Delay       int
 }
 
-// Action is an optional script that can be invoked on demand (e.g., teardown).
+// Action is an optional task that can be invoked on demand (e.g., teardown).
 type Action struct {
-	Task        string `yaml:"task"`
-	Description string `yaml:"description"`
+	Task        string
+	Description string
 }
 
 // TaskResult holds the outcome of executing a single task.
@@ -109,17 +106,4 @@ func (u Unit) Validate() error {
 	}
 
 	return nil
-}
-
-// ResolveUnitPaths fills Dir and Task.Path for all units based on unitsDir.
-func ResolveUnitPaths(unitsDir string, all []Unit) {
-	for i := range all {
-		all[i].Dir = filepath.Join(unitsDir, all[i].ID)
-		for j := range all[i].Stages {
-			for k := range all[i].Stages[j].Tasks {
-				t := &all[i].Stages[j].Tasks[k]
-				t.Path = filepath.Join(all[i].Dir, "tasks", t.Name)
-			}
-		}
-	}
 }

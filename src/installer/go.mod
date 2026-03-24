@@ -4,7 +4,7 @@ go 1.26.1
 
 require (
 	github.com/pterm/pterm v0.12.83
-	gopkg.in/yaml.v3 v3.0.1
+	github.com/yuin/gopher-lua v1.1.1
 )
 
 require (
