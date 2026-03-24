@@ -1,0 +1,19 @@
+id: yay
+name: "yay (AUR helper)"
+critical: true
+stages:
+  - name: verify
+    tasks:
+      - task: verify.sh
+  - name: setup
+    tasks:
+      - task: setup.sh
+        depends_on:
+          - sudoers
+    executor:
+      timeout: 300
+
+actions:
+  teardown:
+    task: teardown.sh
+    description: "Reverte este unit"

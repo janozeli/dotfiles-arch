@@ -1,0 +1,14 @@
+id: oh_my_posh
+name: "oh-my-posh"
+stages:
+  - name: verify
+    tasks:
+      - task: verify.sh
+  - name: setup
+    tasks:
+      - task: setup.sh
+
+actions:
+  teardown:
+    task: teardown.sh
+    description: "Reverte este unit"

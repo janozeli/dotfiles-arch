@@ -1,0 +1,17 @@
+id: sudoers
+name: "NOPASSWD sudoers"
+critical: true
+stages:
+  - name: verify
+    tasks:
+      - task: verify.sh
+  - name: setup
+    tasks:
+      - task: setup.sh
+    executor:
+      sudo: true
+
+actions:
+  teardown:
+    task: teardown.sh
+    description: "Reverte este unit"

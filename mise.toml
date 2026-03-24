@@ -1,2 +1,8 @@
 [tools]
 go = "latest"
+
+[tasks.build]
+run = "go build -C src/runner -o runner ."
+
+[tasks.test]
+run = "go test -C src/runner ./..."
