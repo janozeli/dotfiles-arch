@@ -25,7 +25,9 @@ task "setup" {
 
 task "teardown" {
     run = function()
-        log("teardown not implemented")
+        shell("sudo sed -i 's/^Color/#Color/' /etc/pacman.conf")
+        shell("sudo sed -i 's/^ParallelDownloads/#ParallelDownloads/' /etc/pacman.conf")
+        shell("sudo sed -i '/^ILoveCandy/d' /etc/pacman.conf")
     end,
 }
 

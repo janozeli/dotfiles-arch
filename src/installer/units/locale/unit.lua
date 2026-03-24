@@ -22,7 +22,10 @@ task "setup" {
 
 task "teardown" {
     run = function()
-        log("teardown not implemented")
+        shell("sudo sed -i 's/^pt_BR.UTF-8/#pt_BR.UTF-8/' /etc/locale.gen")
+        shell("sudo locale-gen")
+        shell("sudo localectl set-locale LANG=en_US.UTF-8")
+        shell("sudo localectl set-x11-keymap us")
     end,
 }
 

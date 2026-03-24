@@ -20,7 +20,6 @@ task "setup" {
         shell("cd /tmp/yay && makepkg -si --noconfirm")
         shell("rm -rf /tmp/yay")
         shell("yay -Y --gendb")
-        shell("yay -Syu --noconfirm --devel")
         shell("yay -Y --devel --save")
     end,
 }

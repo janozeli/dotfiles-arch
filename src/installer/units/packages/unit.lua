@@ -2,7 +2,7 @@ unit {
     id = "packages",
     name = "Pacotes (yay)",
     critical = true,
-    depends_on = { "yay" },
+    depends_on = { "system_update" },
 }
 
 local packages = {
@@ -15,7 +15,7 @@ local packages = {
     "docker", "docker-compose", "teams-for-linux-bin",
     "flatpak",
     "visual-studio-code-bin", "obsidian-bin", "ufw",
-    "snap-pac",
+    "snap-pac", "reflector",
 }
 
 task "verify" {

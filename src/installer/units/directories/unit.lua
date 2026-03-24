@@ -26,7 +26,9 @@ task "setup" {
 
 task "teardown" {
     run = function()
-        log("teardown not implemented")
+        local home = env("HOME")
+        shell("rm -rf " .. home .. "/workspace/github.com/hetosoft")
+        shell("rm -rf " .. home .. "/workspace/github.com/janozeli")
     end,
 }
 

@@ -38,7 +38,11 @@ task "setup" {
 
 task "teardown" {
     run = function()
-        log("teardown not implemented")
+        local home = env("HOME")
+        shell("rm -f " .. home .. "/workspace/github.com/janozeli/.gitconfig")
+        shell("rm -f " .. home .. "/workspace/github.com/hetosoft/.gitconfig")
+        shell("git config --global --unset user.email || true")
+        shell("git config --global --unset user.name || true")
     end,
 }
 
