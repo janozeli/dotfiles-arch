@@ -39,8 +39,8 @@ func stringSliceToTable(L *lua.LState, s []string) *lua.LTable {
 	return t
 }
 
-// goValueToLua converts a Go value to a Lua value.
-func goValueToLua(L *lua.LState, v any) lua.LValue {
+// GoValueToLua converts a Go value to a Lua value.
+func GoValueToLua(L *lua.LState, v any) lua.LValue {
 	switch val := v.(type) {
 	case string:
 		return lua.LString(val)
@@ -55,13 +55,13 @@ func goValueToLua(L *lua.LState, v any) lua.LValue {
 	case []any:
 		t := L.NewTable()
 		for _, item := range val {
-			t.Append(goValueToLua(L, item))
+			t.Append(GoValueToLua(L, item))
 		}
 		return t
 	case map[string]any:
 		t := L.NewTable()
 		for k, item := range val {
-			t.RawSetString(k, goValueToLua(L, item))
+			t.RawSetString(k, GoValueToLua(L, item))
 		}
 		return t
 	case nil:
@@ -71,8 +71,8 @@ func goValueToLua(L *lua.LState, v any) lua.LValue {
 	}
 }
 
-// luaValueToGo converts a Lua value to a Go value.
-func luaValueToGo(v lua.LValue) any {
+// LuaValueToGo converts a Lua value to a Go value.
+func LuaValueToGo(v lua.LValue) any {
 	switch val := v.(type) {
 	case *lua.LNilType:
 		return nil
@@ -88,14 +88,14 @@ func luaValueToGo(v lua.LValue) any {
 		if maxN > 0 {
 			result := make([]any, 0, maxN)
 			for i := 1; i <= maxN; i++ {
-				result = append(result, luaValueToGo(val.RawGetInt(i)))
+				result = append(result, LuaValueToGo(val.RawGetInt(i)))
 			}
 			return result
 		}
 		result := make(map[string]any)
 		val.ForEach(func(key, value lua.LValue) {
 			if k, ok := key.(lua.LString); ok {
-				result[string(k)] = luaValueToGo(value)
+				result[string(k)] = LuaValueToGo(value)
 			}
 		})
 		return result

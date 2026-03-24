@@ -90,6 +90,11 @@ func (b *unitBuilder) build() (units.Unit, error) {
 		}
 	}
 
+	// Validate input/output contracts between tasks.
+	if err := b.validateContracts(); err != nil {
+		return units.Unit{}, err
+	}
+
 	// Build actions.
 	b.unit.Actions = b.actions
 
@@ -99,6 +104,35 @@ func (b *unitBuilder) build() (units.Unit, error) {
 	}
 
 	return b.unit, nil
+}
+
+// validateContracts checks that every task input has a corresponding output
+// from a previous task in the pipeline, matched by name and type.
+func (b *unitBuilder) validateContracts() error {
+	available := map[string]string{} // name → type
+
+	for _, name := range b.stageOrder {
+		tf, ok := b.tasks[name]
+		if !ok {
+			continue
+		}
+
+		for inputName, inputType := range tf.Input {
+			outputType, exists := available[inputName]
+			if !exists {
+				return fmt.Errorf("task %q requires input %q but no previous task produces it", name, inputName)
+			}
+			if outputType != inputType {
+				return fmt.Errorf("task %q input %q expects type %q but got %q", name, inputName, inputType, outputType)
+			}
+		}
+
+		for outputName, outputType := range tf.Output {
+			available[outputName] = outputType
+		}
+	}
+
+	return nil
 }
 
 // VM manages Lua state lifecycle for loading units.

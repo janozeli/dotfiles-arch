@@ -4,5 +4,8 @@ go = "latest"
 [tasks.build]
 run = "go build -C src/installer -o runner ./cmd/runner"
 
+[tasks.validate]
+run = "go run -C src/installer ./cmd/unitgen"
+
 [tasks.test]
 run = "go test -C src/installer ./..."

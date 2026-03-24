@@ -27,25 +27,23 @@ task "verify" {
                 table.insert(missing, pkg)
             end
         end
-        context.set("missing", missing)
-        return #missing == 0
+        return #missing == 0, { missing = missing }
     end,
 }
 
 task "setup" {
     input = { missing = "list" },
     timeout = 600,
-    run = function()
-        local missing = context.get("missing")
-        if #missing > 0 then
-            shell("yay -S --noconfirm --needed " .. table.concat(missing, " "))
+    run = function(input)
+        if #input.missing > 0 then
+            shell("yay -S --noconfirm --needed " .. table.concat(input.missing, " "))
         end
     end,
 }
 
 task "teardown" {
     run = function()
-        shell("yay -R --noconfirm " .. table.concat(packages, " "))
+        shell("yay -Rns --noconfirm " .. table.concat(packages, " "))
     end,
 }
 

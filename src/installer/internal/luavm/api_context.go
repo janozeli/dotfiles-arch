@@ -13,6 +13,17 @@ func newContextStore() *contextStore {
 	return &contextStore{data: make(map[string]any)}
 }
 
+// GetData returns the value for a key from the context store.
+func (c *contextStore) GetData(key string) (any, bool) {
+	val, ok := c.data[key]
+	return val, ok
+}
+
+// SetData stores a value in the context store.
+func (c *contextStore) SetData(key string, value any) {
+	c.data[key] = value
+}
+
 // registerContextAPI registers the context table into the Lua state.
 func registerContextAPI(L *lua.LState, ctx *contextStore) {
 	t := L.NewTable()
@@ -20,7 +31,7 @@ func registerContextAPI(L *lua.LState, ctx *contextStore) {
 	L.SetField(t, "set", L.NewFunction(func(L *lua.LState) int {
 		key := L.CheckString(1)
 		value := L.Get(2)
-		ctx.data[key] = luaValueToGo(value)
+		ctx.data[key] = LuaValueToGo(value)
 		return 0
 	}))
 
@@ -31,7 +42,7 @@ func registerContextAPI(L *lua.LState, ctx *contextStore) {
 			L.Push(lua.LNil)
 			return 1
 		}
-		L.Push(goValueToLua(L, val))
+		L.Push(GoValueToLua(L, val))
 		return 1
 	}))
 
