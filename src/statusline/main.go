@@ -32,7 +32,7 @@ type Input struct {
 	SessionID     string `json:"session_id"`
 	ContextWindow struct {
 		RemainingPercentage *float64 `json:"remaining_percentage"`
-		TotalTokens         int      `json:"total_tokens"`
+		TotalTokens         int      `json:"context_window_size"`
 	} `json:"context_window"`
 	RateLimits RateLimits `json:"rate_limits"`
 }
