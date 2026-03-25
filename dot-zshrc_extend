@@ -79,9 +79,6 @@ alias clauderc='${EDITOR:-nano} $HOME/.claude/settings.json'
 # mise
 eval "$(mise activate zsh)"
 
-# env
-[ -f "$HOME/.env" ] && source "$HOME/.env"
-
 # claude
 alias cn="claude --effort max"
 alias cc="cn --continue"
