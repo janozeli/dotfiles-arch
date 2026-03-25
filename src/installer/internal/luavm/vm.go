@@ -178,7 +178,6 @@ func (v *VM) LoadUnit(unitDir string) (*LoadedUnit, error) {
 	registerUnitAPI(L, builder)
 	registerShellAPI(L)
 	registerFsAPI(L, unitDir)
-	registerContextAPI(L, ctx)
 	registerUtilAPI(L)
 
 	// Execute the unit.lua file.
