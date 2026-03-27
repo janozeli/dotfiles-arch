@@ -38,10 +38,20 @@ if [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
 fi
 
 QEMU_ARGS=(
-  -enable-kvm
   -m "$RAM"
   -smp "$CPUS"
-  -cpu host
+)
+
+# Use KVM if available, fall back to TCG
+if [[ -w /dev/kvm ]]; then
+  echo ">>> Using KVM acceleration."
+  QEMU_ARGS+=( -enable-kvm -cpu host )
+else
+  echo ">>> KVM not available, using TCG (slower)."
+  QEMU_ARGS+=( -cpu max )
+fi
+
+QEMU_ARGS+=(
 
   # Disks
   -drive "file=${OVERLAY_IMG},format=qcow2,if=virtio"
