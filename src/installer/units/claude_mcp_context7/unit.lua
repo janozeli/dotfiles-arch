@@ -9,7 +9,7 @@ task "verify" {
         if env("CONTEXT7_API_KEY") == "" then
             return false
         end
-        return shell_ok("claude mcp list 2>/dev/null | grep -q 'context7'")
+        return shell_ok("claude mcp get context7 >/dev/null 2>&1")
     end,
 }
 
@@ -27,7 +27,7 @@ task "setup" {
 
 task "teardown" {
     run = function()
-        shell("claude mcp remove context7")
+        shell("claude mcp remove --scope user context7")
     end,
 }
 

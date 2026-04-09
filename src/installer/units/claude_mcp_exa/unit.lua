@@ -9,7 +9,7 @@ task "verify" {
         if env("EXA_API_KEY") == "" then
             return false
         end
-        return shell_ok("claude mcp list 2>/dev/null | grep -q 'exa'")
+        return shell_ok("claude mcp get exa >/dev/null 2>&1")
     end,
 }
 
@@ -27,7 +27,7 @@ task "setup" {
 
 task "teardown" {
     run = function()
-        shell("claude mcp remove exa")
+        shell("claude mcp remove --scope user exa")
     end,
 }
 
