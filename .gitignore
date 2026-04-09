@@ -2,3 +2,5 @@
 __pycache__/
 logs/
 src/installer/units/manifest.json
+src/statusline/logs/
+dot-claude/hooks/statusline

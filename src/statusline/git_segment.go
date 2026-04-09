@@ -2,10 +2,26 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
+
+func autoFetch(root string) {
+	fetchHead := filepath.Join(root, ".git", "FETCH_HEAD")
+	if info, err := os.Stat(fetchHead); err == nil && time.Since(info.ModTime()) < 3*time.Minute {
+		return
+	}
+	cmd := exec.Command("git", "-C", root, "fetch", "--quiet")
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	cmd.Start()
+}
 
 func gitSegment(cwd string) string {
 	if cwd == "" {
@@ -15,6 +31,8 @@ func gitSegment(cwd string) string {
 	if root == "" {
 		return ""
 	}
+
+	autoFetch(root)
 
 	branch := gitCmd(cwd, "rev-parse", "--abbrev-ref", "HEAD")
 	if branch == "" {
@@ -92,5 +110,13 @@ func gitSegment(cwd string) string {
 		}
 	}
 
-	return CPink + "\ue725 " + branchText + Rst
+	seg := CPink + "\ue725 " + branchText + Rst
+	if root != cwd {
+		repoDisplay := filepath.Base(root)
+		if home := os.Getenv("HOME"); home != "" && strings.HasPrefix(root, home) {
+			repoDisplay = "~" + root[len(home):]
+		}
+		seg += Sep + CCyan + "\uf07c " + osc8Link(editorFileURL(root), repoDisplay) + Rst
+	}
+	return seg
 }

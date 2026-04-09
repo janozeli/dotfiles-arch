@@ -80,8 +80,32 @@ func formatResetCompact(resetsAt int64) string {
 	minutes := int(diff.Minutes()) % 60
 	days := totalHours / 24
 	hours := totalHours % 24
+	var countdown string
 	if days > 0 {
-		return fmt.Sprintf(" \uf252 %dd%02dh", days, hours)
+		countdown = fmt.Sprintf("%dd%02dh", days, hours)
+	} else {
+		countdown = fmt.Sprintf("%dh%02d", totalHours, minutes)
 	}
-	return fmt.Sprintf(" \uf252 %dh%02d", totalHours, minutes)
+	return countdown
+}
+
+func formatResetExact(resetsAt int64) string {
+	if resetsAt == 0 {
+		return ""
+	}
+	resetTime := time.Unix(resetsAt, 0)
+	return resetTime.Format("15h04")
+}
+
+func formatResetExactWeekly(resetsAt int64) string {
+	if resetsAt == 0 {
+		return ""
+	}
+	resetTime := time.Unix(resetsAt, 0)
+	days := map[time.Weekday]string{
+		time.Sunday: "sun", time.Monday: "mon", time.Tuesday: "tue",
+		time.Wednesday: "wed", time.Thursday: "thu", time.Friday: "fri",
+		time.Saturday: "sat",
+	}
+	return days[resetTime.Weekday()] + " " + resetTime.Format("15h04")
 }

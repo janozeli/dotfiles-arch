@@ -6,20 +6,24 @@ import (
 	"strings"
 )
 
-func envSegment(cwd, root string) string {
+func envSegment(cwd, projectDir string) string {
 	if cwd == "" {
 		return ""
 	}
 	var parts []string
 
+	home := os.Getenv("HOME")
+
 	// Project root (only shown if cwd is inside a subdirectory)
-	if root != "" && root != cwd {
-		name := filepath.Base(root)
-		parts = append(parts, CCyan+"\uf07c "+osc8Link(editorFileURL(root), name)+Rst)
+	if projectDir != "" && projectDir != cwd {
+		rootDisplay := filepath.Base(projectDir)
+		if home != "" && strings.HasPrefix(projectDir, home) {
+			rootDisplay = "~" + projectDir[len(home):]
+		}
+		parts = append(parts, CCyan+"\uf07c "+osc8Link(editorFileURL(projectDir), rootDisplay)+Rst)
 	}
 
 	// Directory with ~ shortening and editor deep link
-	home := os.Getenv("HOME")
 	short := cwd
 	if home != "" && strings.HasPrefix(cwd, home) {
 		rest := cwd[len(home):]

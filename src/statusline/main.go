@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -28,31 +26,16 @@ type Input struct {
 	} `json:"model"`
 	Workspace struct {
 		CurrentDir string `json:"current_dir"`
+		ProjectDir string `json:"project_dir"`
 	} `json:"workspace"`
-	SessionID     string `json:"session_id"`
 	ContextWindow struct {
-		RemainingPercentage *float64 `json:"remaining_percentage"`
-		TotalTokens         int      `json:"context_window_size"`
+		UsedPercentage *int `json:"used_percentage"`
+		TotalTokens    int  `json:"context_window_size"`
 	} `json:"context_window"`
 	RateLimits RateLimits `json:"rate_limits"`
 }
 
-func subcommand() string {
-	for _, arg := range os.Args[1:] {
-		if arg == "--debug" {
-			continue
-		}
-		return arg
-	}
-	return ""
-}
-
 func main() {
-	if sub := subcommand(); sub != "" {
-		gsdDispatch(sub)
-		return
-	}
-
 	// Timeout guard: if stdin doesn't close within 3s, exit silently
 	timer := time.AfterFunc(3*time.Second, func() {
 		os.Exit(0)
@@ -64,7 +47,7 @@ func main() {
 	}
 	timer.Stop()
 
-	debugDump("statusline-raw-input.json", raw)
+	debugDump("statusline-raw-input.jsonc", raw)
 
 	var data Input
 	if err := json.Unmarshal(raw, &data); err != nil {
@@ -79,36 +62,16 @@ func main() {
 	if dir == "" {
 		dir, _ = os.Getwd()
 	}
-	session := data.SessionID
-
-	// Context window display (shows USED percentage scaled to usable context)
-	const autoCompactBufferPct = 16.5
+	// Context window display
 	ctx := ""
-	if data.ContextWindow.RemainingPercentage != nil {
-		remaining := *data.ContextWindow.RemainingPercentage
-		usableRemaining := math.Max(0, (remaining-autoCompactBufferPct)/(100-autoCompactBufferPct)*100)
-		used := int(math.Max(0, math.Min(100, math.Round(100-usableRemaining))))
-
-		// Bridge file for context-monitor
-		if session != "" {
-			bridgePath := filepath.Join(os.TempDir(), fmt.Sprintf("claude-ctx-%s.json", session))
-			bridgeData, _ := json.Marshal(map[string]interface{}{
-				"session_id":           session,
-				"remaining_percentage": remaining,
-				"used_pct":            used,
-				"timestamp":           time.Now().Unix(),
-			})
-			os.WriteFile(bridgePath, bridgeData, 0644)
-		}
+	if data.ContextWindow.UsedPercentage != nil {
+		used := *data.ContextWindow.UsedPercentage
 
 		totalTokens := data.ContextWindow.TotalTokens
-		if totalTokens == 0 {
-			totalTokens = 200000
-		}
-		usedTokens := int(math.Round(float64(totalTokens) * float64(used) / 100))
+		usedTokens := totalTokens * used / 100
 		var tokenStr string
 		if usedTokens >= 1000 {
-			tokenStr = fmt.Sprintf("%dk", int(math.Round(float64(usedTokens)/1000)))
+			tokenStr = fmt.Sprintf("%dk", (usedTokens+500)/1000)
 		} else {
 			tokenStr = fmt.Sprintf("%d", usedTokens)
 		}
@@ -127,40 +90,14 @@ func main() {
 		}
 	}
 
-	// Current task from todos
-	task := ""
-	homeDir, _ := os.UserHomeDir()
-	claudeDir := os.Getenv("CLAUDE_CONFIG_DIR")
-	if claudeDir == "" {
-		claudeDir = filepath.Join(homeDir, ".claude")
-	}
-	todosDir := filepath.Join(claudeDir, "todos")
-	if session != "" {
-		task = findCurrentTask(todosDir, session)
-	}
-
-	// GSD update available? (only if current project uses GSD)
-	gsdUpdate := ""
-	if _, err := os.Stat(filepath.Join(dir, ".planning")); err == nil {
-		gsdCacheFile := filepath.Join(claudeDir, "cache", "gsd-update-check.json")
-		gsdUpdate = checkGsdUpdate(gsdCacheFile)
-	}
-
-	// Build GSD line
+	// Build status line
 	ctxSep := " " + CComment + "\u2502" + Rst
-	var gsdLine string
-	if task != "" {
-		gsdLine = gsdUpdate + CPurple + "\uee9c " + model + Rst + Sep + "\x1b[1m" + task + Rst
-		if ctx != "" {
-			gsdLine += ctxSep + ctx
-		}
-	} else {
-		gsdLine = gsdUpdate + CPurple + "\uee9c " + model + Rst
-		if ctx != "" {
-			gsdLine += ctxSep + ctx
-		}
+	line := CPurple + "\uee9c " + model + Rst
+	if ctx != "" {
+		line += ctxSep + ctx
 	}
 
-	render(gsdLine, dir, data.RateLimits)
+	projectDir := data.Workspace.ProjectDir
+	render(line, dir, projectDir, data.RateLimits)
 }
 

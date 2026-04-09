@@ -12,14 +12,24 @@ func usageSegment(limits RateLimits) string {
 	if limits.FiveHour.UsedPercentage > 0 {
 		pct := limits.FiveHour.UsedPercentage
 		color := thresholdColor(pct)
-		reset := formatResetCompact(limits.FiveHour.ResetsAt)
+		countdown := formatResetCompact(limits.FiveHour.ResetsAt)
+		exact := formatResetExact(limits.FiveHour.ResetsAt)
+		reset := ""
+		if countdown != "" {
+			reset = " \uf252 " + countdown + " @" + exact
+		}
 		parts = append(parts, osc8Link(usageURL, CPurple+"\uf1da Session:"+Rst+" "+color+fmt.Sprintf("%.0f%%%s", pct, reset))+Rst)
 	}
 
 	if limits.SevenDay.UsedPercentage > 0 {
 		pct := limits.SevenDay.UsedPercentage
 		color := thresholdColor(pct)
-		reset := formatResetCompact(limits.SevenDay.ResetsAt)
+		countdown := formatResetCompact(limits.SevenDay.ResetsAt)
+		exact := formatResetExactWeekly(limits.SevenDay.ResetsAt)
+		reset := ""
+		if countdown != "" {
+			reset = " \uf252 " + countdown + " " + exact
+		}
 		parts = append(parts, osc8Link(usageURL, CPurple+"\uf073 Weekly:"+Rst+" "+color+fmt.Sprintf("%.0f%%%s", pct, reset))+Rst)
 	}
 

@@ -5,16 +5,12 @@ import (
 	"strings"
 )
 
-func render(gsdLine, dir string, rateLimits RateLimits) {
-	lines := []string{gsdLine}
+func render(line, dir, projectDir string, rateLimits RateLimits) {
+	lines := []string{line}
 
-	root := gitCmd(dir, "rev-parse", "--show-toplevel")
-
-	envSeg := envSegment(dir, root)
-	ghSeg := ghSegment(dir)
-	if envSeg != "" || ghSeg != "" {
-		parts := filterEmpty(envSeg, ghSeg)
-		lines = append(lines, strings.Join(parts, Sep))
+	envSeg := envSegment(dir, projectDir)
+	if envSeg != "" {
+		lines = append(lines, envSeg)
 	}
 
 	usageSeg := usageSegment(rateLimits)
@@ -22,12 +18,11 @@ func render(gsdLine, dir string, rateLimits RateLimits) {
 		lines = append(lines, usageSeg)
 	}
 
-	gitSeg := ""
-	if root != "" {
-		gitSeg = gitSegment(dir)
-	}
-	if gitSeg != "" {
-		lines = append(lines, gitSeg)
+	gitSeg := gitSegment(dir)
+	ghSeg := ghSegment(dir)
+	if gitSeg != "" || ghSeg != "" {
+		parts := filterEmpty(gitSeg, ghSeg)
+		lines = append(lines, strings.Join(parts, Sep))
 	}
 
 	// Render: box layout with rounded corners
