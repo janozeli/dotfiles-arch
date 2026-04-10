@@ -7,14 +7,9 @@ import (
 	"time"
 )
 
-func getGhAccount() string {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	cmd := exec.CommandContext(ctx, "gh", "auth", "status")
-	out, _ := cmd.CombinedOutput()
-
+func parseGhAuthStatus(output string) string {
 	var current string
-	for _, line := range strings.Split(string(out), "\n") {
+	for _, line := range strings.Split(output, "\n") {
 		if idx := strings.Index(line, "Logged in to github.com account "); idx >= 0 {
 			rest := line[idx+len("Logged in to github.com account "):]
 			if fields := strings.Fields(rest); len(fields) > 0 {
@@ -26,6 +21,14 @@ func getGhAccount() string {
 		}
 	}
 	return ""
+}
+
+func getGhAccount() string {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "gh", "auth", "status")
+	out, _ := cmd.CombinedOutput()
+	return parseGhAuthStatus(string(out))
 }
 
 func ghSegment(cwd string) string {
