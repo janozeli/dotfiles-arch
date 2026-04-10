@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 )
 
 func TestStripAnsi(t *testing.T) {
@@ -88,6 +89,66 @@ func TestEditorFileURL(t *testing.T) {
 			t.Setenv("EDITOR", tt.editor)
 			if got := editorFileURL(tt.path); got != tt.want {
 				t.Errorf("editorFileURL(%q) = %q, want %q", tt.path, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatDuration(t *testing.T) {
+	tests := []struct {
+		name string
+		d    time.Duration
+		want string
+	}{
+		{"negative", -1 * time.Hour, ""},
+		{"zero", 0, ""},
+		{"30min", 30 * time.Minute, "0h30"},
+		{"2h15m", 2*time.Hour + 15*time.Minute, "2h15"},
+		{"1d3h", 27 * time.Hour, "1d03h"},
+		{"3d12h", (3*24 + 12) * time.Hour, "3d12h"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := formatDuration(tt.d); got != tt.want {
+				t.Errorf("formatDuration(%v) = %q, want %q", tt.d, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatResetExact(t *testing.T) {
+	tests := []struct {
+		name     string
+		resetsAt int64
+		want     string
+	}{
+		{"zero", 0, ""},
+		{"afternoon", time.Date(2026, 4, 10, 14, 30, 0, 0, time.Local).Unix(), "14h30"},
+		{"midnight", time.Date(2026, 1, 1, 0, 0, 0, 0, time.Local).Unix(), "00h00"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := formatResetExact(tt.resetsAt); got != tt.want {
+				t.Errorf("formatResetExact(%d) = %q, want %q", tt.resetsAt, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatResetExactWeekly(t *testing.T) {
+	tests := []struct {
+		name     string
+		resetsAt int64
+		want     string
+	}{
+		{"zero", 0, ""},
+		// 2026-04-10 is a Friday
+		{"friday", time.Date(2026, 4, 10, 14, 30, 0, 0, time.Local).Unix(), "fri 14h30"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := formatResetExactWeekly(tt.resetsAt); got != tt.want {
+				t.Errorf("formatResetExactWeekly(%d) = %q, want %q", tt.resetsAt, got, tt.want)
 			}
 		})
 	}

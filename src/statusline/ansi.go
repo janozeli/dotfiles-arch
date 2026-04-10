@@ -68,25 +68,25 @@ func thresholdColor(pct float64) string {
 	return CGreen
 }
 
+func formatDuration(d time.Duration) string {
+	if d <= 0 {
+		return ""
+	}
+	totalHours := int(d.Hours())
+	minutes := int(d.Minutes()) % 60
+	days := totalHours / 24
+	hours := totalHours % 24
+	if days > 0 {
+		return fmt.Sprintf("%dd%02dh", days, hours)
+	}
+	return fmt.Sprintf("%dh%02d", totalHours, minutes)
+}
+
 func formatResetCompact(resetsAt int64) string {
 	if resetsAt == 0 {
 		return ""
 	}
-	diff := time.Until(time.Unix(resetsAt, 0))
-	if diff <= 0 {
-		return ""
-	}
-	totalHours := int(diff.Hours())
-	minutes := int(diff.Minutes()) % 60
-	days := totalHours / 24
-	hours := totalHours % 24
-	var countdown string
-	if days > 0 {
-		countdown = fmt.Sprintf("%dd%02dh", days, hours)
-	} else {
-		countdown = fmt.Sprintf("%dh%02d", totalHours, minutes)
-	}
-	return countdown
+	return formatDuration(time.Until(time.Unix(resetsAt, 0)))
 }
 
 func formatResetExact(resetsAt int64) string {
