@@ -23,6 +23,29 @@ func autoFetch(root string) {
 	cmd.Start()
 }
 
+func gitPathDisplay(root, cwd string) string {
+	if root == cwd {
+		return ""
+	}
+	rel, _ := filepath.Rel(root, cwd)
+	repoBase := filepath.Base(root)
+	relParts := strings.Split(rel, "/")
+	if len(relParts) > 2 {
+		rel = ".../" + relParts[len(relParts)-1]
+	}
+	return repoBase + "/" + rel
+}
+
+func remoteToRepoURL(remote string) string {
+	if strings.HasPrefix(remote, "git@github.com:") {
+		return "https://github.com/" + strings.TrimSuffix(remote[15:], ".git")
+	}
+	if strings.HasPrefix(remote, "https://github.com/") {
+		return strings.TrimSuffix(remote, ".git")
+	}
+	return ""
+}
+
 func gitSegment(cwd string) string {
 	if cwd == "" {
 		return ""
@@ -97,31 +120,12 @@ func gitSegment(cwd string) string {
 
 	// Branch text with optional GitHub link
 	branchText := branch + indicators
-	remote := gitCmd(cwd, "remote", "get-url", "origin")
-	if remote != "" {
-		var repoURL string
-		if strings.HasPrefix(remote, "git@github.com:") {
-			repoURL = "https://github.com/" + strings.TrimSuffix(remote[15:], ".git")
-		} else if strings.HasPrefix(remote, "https://github.com/") {
-			repoURL = strings.TrimSuffix(remote, ".git")
-		}
-		if repoURL != "" {
-			branchText = osc8Link(repoURL, branchText)
-		}
+	if repoURL := remoteToRepoURL(gitCmd(cwd, "remote", "get-url", "origin")); repoURL != "" {
+		branchText = osc8Link(repoURL, branchText)
 	}
 
 	seg := CPink + "\ue725 " + branchText + Rst
-	if root != cwd {
-		rel, _ := filepath.Rel(root, cwd)
-		repoBase := filepath.Base(root)
-		if home := os.Getenv("HOME"); home != "" && strings.HasPrefix(root, home) {
-			repoBase = "~/" + repoBase
-		}
-		display := repoBase + "/" + rel
-		parts := strings.Split(display, "/")
-		if len(parts) > 3 {
-			display = parts[0] + "/.../" + parts[len(parts)-1]
-		}
+	if display := gitPathDisplay(root, cwd); display != "" {
 		seg += Sep + CCyan + "\uf07c " + osc8Link(editorFileURL(cwd), display) + Rst
 	}
 	return seg
