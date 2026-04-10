@@ -112,11 +112,17 @@ func gitSegment(cwd string) string {
 
 	seg := CPink + "\ue725 " + branchText + Rst
 	if root != cwd {
-		repoDisplay := filepath.Base(root)
+		rel, _ := filepath.Rel(root, cwd)
+		repoBase := filepath.Base(root)
 		if home := os.Getenv("HOME"); home != "" && strings.HasPrefix(root, home) {
-			repoDisplay = "~" + root[len(home):]
+			repoBase = "~/" + repoBase
 		}
-		seg += Sep + CCyan + "\uf07c " + osc8Link(editorFileURL(root), repoDisplay) + Rst
+		display := repoBase + "/" + rel
+		parts := strings.Split(display, "/")
+		if len(parts) > 3 {
+			display = parts[0] + "/.../" + parts[len(parts)-1]
+		}
+		seg += Sep + CCyan + "\uf07c " + osc8Link(editorFileURL(cwd), display) + Rst
 	}
 	return seg
 }

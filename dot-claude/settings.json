@@ -2,7 +2,9 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
     "CLAUDE_CODE_SHELL": "bash",
-    "CLAUDE_ENV_FILE": "/home/janozeli/.claude/env.sh"
+    "CLAUDE_ENV_FILE": "/home/janozeli/.claude/env.sh",
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+    "CLAUDE_CODE_NO_FLICKER": "1"
   },
   "permissions": {
     "defaultMode": "bypassPermissions"
@@ -25,11 +27,11 @@
     "command": "~/.claude/hooks/statusline --debug"
   },
   "enabledPlugins": {
-    "superpowers@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "brave-search-skills@brave-search": true,
     "claude-md-management@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "brave-search": {
@@ -39,6 +41,7 @@
       }
     }
   },
+  "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true
 }
