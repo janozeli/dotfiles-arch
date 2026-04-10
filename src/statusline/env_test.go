@@ -16,12 +16,35 @@ func TestEnvSegment(t *testing.T) {
 		wantEmpty    bool
 		wantContains []string
 	}{
+		// cwd vazio
 		{"empty cwd", "/home/user", "", "", true, nil},
+
+		// cwd sob HOME, sem abreviacao (parts <= 3)
 		{"at home", "/home/user", "/home/user", "", false, []string{"~/"}},
-		{"subdir", "/home/user", "/home/user/projects/foo", "", false, []string{"~/projects/foo"}},
-		{"deep path", "/home/user", "/home/user/a/b/c/d", "", false, []string{"~/a/.../d"}},
-		{"with project dir", "/home/user", "/home/user/proj/sub", "/home/user/proj", false, []string{"~/proj", "~/proj/sub"}},
-		{"outside home", "/home/user", "/opt/project", "", false, []string{"/opt/project"}},
+		{"one level", "/home/user", "/home/user/foo", "", false, []string{"~/foo"}},
+		{"two levels", "/home/user", "/home/user/foo/bar", "", false, []string{"~/foo/bar"}},
+
+		// cwd sob HOME, com abreviacao (parts > 3)
+		{"three levels abbreviated", "/home/user", "/home/user/a/b/c", "", false, []string{"~/a/.../c"}},
+		{"four levels abbreviated", "/home/user", "/home/user/a/b/c/d", "", false, []string{"~/a/.../d"}},
+
+		// cwd fora de HOME
+		{"outside home shallow", "/home/user", "/opt/project", "", false, []string{"/opt/project"}},
+		{"outside home deep", "/home/user", "/opt/a/b/c", "", false, []string{"/opt/.../c"}},
+
+		// HOME vazio
+		{"no home shallow", "", "/opt/proj", "", false, []string{"/opt/proj"}},
+		{"no home deep", "", "/home/user/a/b/c", "", false, []string{"/home/.../c"}},
+
+		// projectDir sob HOME
+		{"project under home", "/home/user", "/home/user/proj/sub", "/home/user/proj", false, []string{"~/proj", "~/proj/sub"}},
+		{"project under home nested", "/home/user", "/home/user/work/proj/sub", "/home/user/work/proj", false, []string{"~/work/proj", "~/work/.../sub"}},
+
+		// projectDir fora de HOME
+		{"project outside home", "/home/user", "/opt/proj/sub", "/opt/proj", false, []string{"proj", "/opt/.../sub"}},
+
+		// projectDir com HOME vazio
+		{"project no home", "", "/opt/proj/sub", "/opt/proj", false, []string{"proj", "/opt/.../sub"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
