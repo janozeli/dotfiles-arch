@@ -46,6 +46,28 @@ func remoteToRepoURL(remote string) string {
 	return ""
 }
 
+func parseNumstat(numstat string) (ins, del int) {
+	for _, line := range strings.Split(numstat, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) >= 2 && fields[0] != "-" {
+			n, _ := strconv.Atoi(fields[0])
+			ins += n
+			n, _ = strconv.Atoi(fields[1])
+			del += n
+		}
+	}
+	return
+}
+
+func parseAheadBehind(ab string) (ahead, behind int) {
+	parts := strings.Fields(ab)
+	if len(parts) == 2 {
+		ahead, _ = strconv.Atoi(parts[0])
+		behind, _ = strconv.Atoi(parts[1])
+	}
+	return
+}
+
 func gitSegment(cwd string) string {
 	if cwd == "" {
 		return ""
@@ -84,16 +106,7 @@ func gitSegment(cwd string) string {
 	// Insertions/deletions
 	numstat := gitCmd(cwd, "diff", "--numstat")
 	if numstat != "" {
-		ins, del := 0, 0
-		for _, line := range strings.Split(numstat, "\n") {
-			fields := strings.Fields(line)
-			if len(fields) >= 2 && fields[0] != "-" {
-				n, _ := strconv.Atoi(fields[0])
-				ins += n
-				n, _ = strconv.Atoi(fields[1])
-				del += n
-			}
-		}
+		ins, del := parseNumstat(numstat)
 		if ins > 0 {
 			indicators += fmt.Sprintf(" %s+%d%s", CGreen, ins, CPink)
 		}
@@ -105,16 +118,12 @@ func gitSegment(cwd string) string {
 	// Ahead/behind remote
 	ab := gitCmd(cwd, "rev-list", "--left-right", "--count", "HEAD...@{upstream}")
 	if ab != "" {
-		parts := strings.Fields(ab)
-		if len(parts) == 2 {
-			ahead, _ := strconv.Atoi(parts[0])
-			behind, _ := strconv.Atoi(parts[1])
-			if ahead > 0 {
-				indicators += fmt.Sprintf(" %s\u2191%d%s", CCyan, ahead, CPink)
-			}
-			if behind > 0 {
-				indicators += fmt.Sprintf(" %s\u2193%d%s", CCyan, behind, CPink)
-			}
+		ahead, behind := parseAheadBehind(ab)
+		if ahead > 0 {
+			indicators += fmt.Sprintf(" %s\u2191%d%s", CCyan, ahead, CPink)
+		}
+		if behind > 0 {
+			indicators += fmt.Sprintf(" %s\u2193%d%s", CCyan, behind, CPink)
 		}
 	}
 

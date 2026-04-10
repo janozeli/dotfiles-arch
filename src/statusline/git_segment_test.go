@@ -40,3 +40,47 @@ func TestRemoteToRepoURL(t *testing.T) {
 		})
 	}
 }
+
+func TestParseNumstat(t *testing.T) {
+	tests := []struct {
+		name             string
+		numstat          string
+		wantIns, wantDel int
+	}{
+		{"empty", "", 0, 0},
+		{"single file", "10\t5\tfile.go", 10, 5},
+		{"multiple files", "10\t5\ta.go\n3\t2\tb.go", 13, 7},
+		{"binary file", "-\t-\timage.png", 0, 0},
+		{"mixed", "10\t5\ta.go\n-\t-\tb.png\n3\t0\tc.go", 13, 5},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ins, del := parseNumstat(tt.numstat)
+			if ins != tt.wantIns || del != tt.wantDel {
+				t.Errorf("parseNumstat(%q) = (%d, %d), want (%d, %d)", tt.numstat, ins, del, tt.wantIns, tt.wantDel)
+			}
+		})
+	}
+}
+
+func TestParseAheadBehind(t *testing.T) {
+	tests := []struct {
+		name                   string
+		input                  string
+		wantAhead, wantBehind int
+	}{
+		{"empty", "", 0, 0},
+		{"ahead only", "3\t0", 3, 0},
+		{"behind only", "0\t5", 0, 5},
+		{"both", "2\t4", 2, 4},
+		{"malformed", "abc", 0, 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ahead, behind := parseAheadBehind(tt.input)
+			if ahead != tt.wantAhead || behind != tt.wantBehind {
+				t.Errorf("parseAheadBehind(%q) = (%d, %d), want (%d, %d)", tt.input, ahead, behind, tt.wantAhead, tt.wantBehind)
+			}
+		})
+	}
+}
