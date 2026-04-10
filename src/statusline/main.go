@@ -65,29 +65,7 @@ func main() {
 	// Context window display
 	ctx := ""
 	if data.ContextWindow.UsedPercentage != nil {
-		used := *data.ContextWindow.UsedPercentage
-
-		totalTokens := data.ContextWindow.TotalTokens
-		usedTokens := totalTokens * used / 100
-		var tokenStr string
-		if usedTokens >= 1000 {
-			tokenStr = fmt.Sprintf("%dk", (usedTokens+500)/1000)
-		} else {
-			tokenStr = fmt.Sprintf("%d", usedTokens)
-		}
-
-		filled := used / 10
-		bar := strings.Repeat("\u2588", filled) + strings.Repeat("\u2591", 10-filled)
-
-		if used < 50 {
-			ctx = fmt.Sprintf(" %s%s %s %d%%%s", CGreen, tokenStr, bar, used, Rst)
-		} else if used < 65 {
-			ctx = fmt.Sprintf(" %s%s %s %d%%%s", CYellow, tokenStr, bar, used, Rst)
-		} else if used < 80 {
-			ctx = fmt.Sprintf(" %s%s %s %d%%%s", CRed, tokenStr, bar, used, Rst)
-		} else {
-			ctx = fmt.Sprintf(" \x1b[5;38;2;255;85;85m\U0001F480 %s %s %d%%%s", tokenStr, bar, used, Rst)
-		}
+		ctx = contextDisplay(*data.ContextWindow.UsedPercentage, data.ContextWindow.TotalTokens)
 	}
 
 	// Build status line
@@ -101,3 +79,24 @@ func main() {
 	render(line, dir, projectDir, data.RateLimits)
 }
 
+func contextDisplay(usedPct, totalTokens int) string {
+	usedTokens := totalTokens * usedPct / 100
+	var tokenStr string
+	if usedTokens >= 1000 {
+		tokenStr = fmt.Sprintf("%dk", (usedTokens+500)/1000)
+	} else {
+		tokenStr = fmt.Sprintf("%d", usedTokens)
+	}
+
+	filled := usedPct / 10
+	bar := strings.Repeat("\u2588", filled) + strings.Repeat("\u2591", 10-filled)
+
+	if usedPct < 50 {
+		return fmt.Sprintf(" %s%s %s %d%%%s", CGreen, tokenStr, bar, usedPct, Rst)
+	} else if usedPct < 65 {
+		return fmt.Sprintf(" %s%s %s %d%%%s", CYellow, tokenStr, bar, usedPct, Rst)
+	} else if usedPct < 80 {
+		return fmt.Sprintf(" %s%s %s %d%%%s", CRed, tokenStr, bar, usedPct, Rst)
+	}
+	return fmt.Sprintf(" \x1b[5;38;2;255;85;85m\U0001F480 %s %s %d%%%s", tokenStr, bar, usedPct, Rst)
+}
